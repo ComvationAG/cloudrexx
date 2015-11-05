@@ -518,7 +518,7 @@
       domainUrl = cx.variables.get('baseUrl', 'MultiSite') + cx.variables.get('cadminPath', 'contrexx') + "index.php?cmd=JsonData&object=MultiSite&act=";
       var serviceServerId = $(this).data('id');
       cx.jQuery.ajax({
-        url: domainUrl + 'getCodeBaseVersions',
+        url: domainUrl + 'getCodeBaseVersionsAndComponents',
         type: "POST",
         data: {serviceServerId: serviceServerId},
         dataType: "json",
@@ -541,19 +541,40 @@
                 $(response.data.codeBaseVersions).each(function (index, codeBaseVersion) {
                   codeBaseDropDown.append($('<option />').text(codeBaseVersion));
                 });
-
+                //Component dropdown
+                var componentDropdown = $('<select />').attr('name', 'components[]')
+                                        .attr('class', 'chzn-select').attr('multiple', 'multiple');
+                $(response.data.components).each(function (index, component) {
+                   componentDropdown.append($('<option />').text(component));
+                });
+                //dialog content
                 var dialogContent = cx.variables.get('updateNotAvailable', 'multisite/lang');
                 if (response.data.codeBaseVersions != '') {
                     dialogContent = $('<form>').attr({'id': 'websiteUpdateForm', 'name': 'frmShowWebsites'})
-                            .append($('<label/>').text(cx.variables.get('latestCodeBaseVersion', 'multisite/lang'))
-                                    .append(codeBaseDropDown)).append('<br/>')
-                            .append($('<div/>').attr('id', 'websitesSection'))
-                            .submit(function () {
-                              var data = $(this).serialize() + '&serviceServerId=' + serviceServerId;
-                              var url = domainUrl + 'triggerWebsiteUpdate';
-                              triggerWebsiteUpdate(url, data);
-                              return false;
-                            });
+                                    .append(
+                                        $('<div/>').attr({'id': 'container'})
+                                        .append(
+                                            $('<div/>').attr({'class': 'row'}).append(
+                                                $('<label/>').text(cx.variables.get('latestCodeBaseVersion', 'multisite/lang'))
+                                            ).append(
+                                                $('<span/>').html(codeBaseDropDown)
+                                            )
+                                        ).append(
+                                            $('<div/>').attr({'class': 'row'}).append(
+                                                $('<label/>').text(cx.variables.get('componentListLabel', 'multisite/lang'))
+                                            ).append(
+                                                $('<span/>').html(componentDropdown)
+                                            )
+                                        ).append(
+                                                $('<div/>').attr({'id' : 'websitesSection', 'class': 'row'})
+                                        )
+                                    )
+                                    .submit(function () {
+                                      var data = $(this).serialize() + '&serviceServerId=' + serviceServerId;
+                                      var url = domainUrl + 'triggerWebsiteUpdate';
+                                      triggerWebsiteUpdate(url, data);
+                                      return false;
+                                    });
                 }
                 cx.ui.dialog({
                   width: 820,
@@ -563,6 +584,7 @@
                   autoOpen: true,
                   modal: true
                 });
+                $('.chzn-select').chosen();
                 var codeBase = $("select[name='codeBase']").val();
                 if (codeBase != null) {
                   getWebsitesByCodeBase(domainUrl, serviceServerId, codeBase);
@@ -595,7 +617,7 @@
             //websites
             var table = $('<table />')
                              .addClass('adminlist')
-                              .attr({"align" : "center" });
+                             .attr({'align' : 'center', 'width' : '80%'});
                         table.append($('<tr />')
                              .append($('<th />').text("#"))
                              .append($('<th />').text(cx.variables.get('websiteName', 'multisite/lang')))
@@ -616,13 +638,17 @@
             htmlElement.html(cx.variables.get('websitesNotExist', 'multisite/lang'));
           } else {
             htmlElement.html(table);
-            htmlElement.append($('<a />')
+            htmlElement.append(
+                $('<div/>').attr({'class' : 'row'}).append(
+                    $('<span/>').append($('<a />')
                                   .attr("onclick", "changeCheckboxes(\'frmShowWebsites\',\'websites[]\',true); return false;" )
-                                  .text(cx.variables.get('selectAll', 'multisite/lang') + " / "));
-            htmlElement.append($('<a />')
+                                  .text(cx.variables.get('selectAll', 'multisite/lang') + " / ")
+                                ).append($('<a />')
                                   .attr("onclick", "changeCheckboxes(\'frmShowWebsites\',\'websites[]\',false); return false;" )
-                                  .text(cx.variables.get('deSelectAll', 'multisite/lang')));
-            htmlElement.append($('<input />').attr('type', 'submit').val('Update').addClass('update'));
+                                  .text(cx.variables.get('deSelectAll', 'multisite/lang'))
+                                ).append($('<input />').attr('type', 'submit').val('Update').addClass('update'))
+                )
+            );
           }
         }
       });

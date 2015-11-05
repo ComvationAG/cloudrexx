@@ -314,6 +314,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 'loadingServiceServerInfo'  => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_LOADING_SERVICE_SERVER_INFO'],
                 'triggeringWebsiteUpdate'   => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_TRIGGERING_WEBSITE_UPDATE'],
                 'latestCodeBaseVersion'     => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_CODEBASE_VERSION'],
+                'componentListLabel'        => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_COMPONENT_LIST_LABEL'],
                 'codeBaseNotExist'          => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_CODEBASE_NOT_EXIST'],
                 'updateNotAvailable'        => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_UPDATE_NOT_AVAILABLE'],
                 'websiteName'               => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITENAME'],

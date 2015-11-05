@@ -89,16 +89,36 @@ a.websiteUpdate{
     cursor: pointer;
 }
 
-#websitesSection label{
-    font-weight: bold;
-}
-
 #websiteUpdateForm{
-      padding: 45px 80px;
+      padding: 75px 180px;
       text-align: center;
 }
-#websitesSection table.adminlist{
-    margin-bottom: 25px;
+#websiteUpdateForm #container{ height: auto;}
+#websiteUpdateForm .row {
+    width: 100%;
+    padding: 8px 8px 8px 45px;
+    float: left;
+}
+#websiteUpdateForm table.adminlist{
+    margin: 0px;
+}
+#websiteUpdateForm .row label {
+    width: 40%;
+    float: left;
+    text-align: left;
+}
+#websiteUpdateForm .row span {
+    width: 60%;
+    float: left;
+    text-align: left;
+}
+#websiteUpdateForm .chosen-container {
+    width: 165px !important;
+    padding-left: 5px;
+}
+#websiteUpdateForm .chosen-container.chosen-with-drop .chosen-drop { left: 5px;}
+#websiteUpdateForm .chosen-results {
+    text-align: left;
 }
 #websiteUpdateForm a{
       color: #1a74bd;
@@ -166,9 +186,6 @@ a.deleteMultisiteConfig {
 }
 .ui-dialog #loading.websiteBackup {
  height: 28px !important;
-}
-#websitesSection{
-    padding-top: 15px;
 }
 
 #websiteUpdateForm select{

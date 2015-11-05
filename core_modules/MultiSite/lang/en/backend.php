@@ -514,13 +514,14 @@ $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_NOTIFICATION_LOGS'] = 'Notification logs'
 //update
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_LOADING_SERVICE_SERVER_INFO'] = 'Fetching the Codebases from the service server';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_TRIGGERING_WEBSITE_UPDATE'] = 'Triggering the website update process';
-$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_SERVICE_SERVER_CODEBASE_REQUEST_SUCCESS'] = 'Codebases are successfully fetched from the service server';
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_SERVICE_SERVER_CODEBASE_REQUEST_SUCCESS'] = 'Codebases and Components are successfully fetched from the service server';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_TRIGGERING_WEBSITE_UPDATE_SUCCESS_MSG'] = 'Website Update process triggered successfully';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_CODEBASE_VERSION'] = 'CodeBase Version :';
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_COMPONENT_LIST_LABEL'] = 'Component List :';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_UPDATE_NOT_AVAILABLE'] = 'Update not available';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_CODEBASE_NOT_EXIST'] = 'Codebase does not exists';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_UPDATE_PROCESS_ERROR_MSG'] = 'Unable to trigger the website update process';
-$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_CODEBASES_ERROR_MSG'] = 'Unable to get the codebases';
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_CODEBASES_COMPONENTS_ERROR_MSG'] = 'Unable to get the codebases and components list';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_WEBSITES_ERROR_MSG'] = 'Unable to get the websites';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_WEBSITES_SUCCESS_MSG'] = 'Websites are successfully fetched from the service server';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_UPDATE_ERROR_MSG'] = 'Failed to update the website';
