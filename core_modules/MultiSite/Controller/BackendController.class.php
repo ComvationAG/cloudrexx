@@ -691,25 +691,23 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 'filtering' => false,   // this does not exist yet
                 'actions' => function($rowData) {
                                 if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
-                                    $actions = \Cx\Core_Modules\MultiSite\Controller\BackendController::executeSql($rowData, false);
-                                }
-                                if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
+                                    //add the 'websiteUpdate' action to update a website or single/multiple component
+                                    $actions  = '<a href="javascript:void(0);" class = "websiteUpdateProcess" data-id = '.$rowData['id'].' title = "update" ></a>';
+                                    //add the 'executeSql' action to run the sql query in the corresponding website
+                                    $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::executeSql($rowData, false);
+                                    //add the 'showLicense' action to show and edit the website license
                                     $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::showLicense($rowData, false);
-                                }
-                                if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
+                                    //add the 'remoteLogin' action to login into the website backend
                                     $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::remoteLogin($rowData, false);
-                                }
-                                if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
+                                    //add the 'remoteLogin' action to login into the customerpanel
                                     $domainRepo = \Env::get('em')->getRepository('Cx\Core\Net\Model\Entity\Domain');
                                     $domain     = $domainRepo->findOneBy(array('name' => \Cx\Core\Setting\Controller\Setting::getValue('customerPanelDomain','MultiSite')));
                                     if ($domain) {
                                         $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::remoteLogin($rowData, true);
                                     }
-                                }
-                                if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
+                                    //add the 'websiteBackup' action to backup the website
                                     $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::websiteBackup($rowData);
-                                }
-                                if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
+                                    //add the 'multiSiteConfig' action to show and edit the MultiSite config
                                     $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::multiSiteConfig($rowData, false);
                                 }
                                 return $actions;
@@ -810,6 +808,20 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         if (isset($_GET['editid']) && !empty($_GET['editid'])) {
             $template->hideBlock("website_filter");
         }
+            $cxjs = \ContrexxJavascript::getInstance();
+            $cxjs->setVariable(array(
+                'selectAll'                 => $_ARRAYLANG['TXT_SELECT_ALL'],
+                'deSelectAll'               => $_ARRAYLANG['TXT_DESELECT_ALL'],
+                'loadingServiceServerInfo'  => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_LOADING_SERVICE_SERVER_INFO'],
+                'triggeringWebsiteUpdate'   => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_TRIGGERING_WEBSITE_UPDATE'],
+                'latestCodeBaseVersion'     => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_CODEBASE_VERSION'],
+                'codeBaseNotExist'          => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_CODEBASE_NOT_EXIST'],
+                'updateNotAvailable'        => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_UPDATE_NOT_AVAILABLE'],
+                'websiteName'               => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_COMPONENTNAME'],
+                'codeBase'                  => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_ACT_SETTINGS_CODEBASES'],
+                'componentsNotExist'        => $_ARRAYLANG['TXT_MULTISITE_NO_COMPONENTS_FOUND'],
+                'loading'                   => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_LOADING_TEXT']
+                ), 'multisite/lang');
         $template->setVariable('TABLE', $view->render());
     }
     

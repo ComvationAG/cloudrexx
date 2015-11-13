@@ -79,7 +79,7 @@ a.websiteBackup {
     cursor: pointer;
 }
 
-a.websiteUpdate{
+a.websiteUpdate, a.websiteUpdateProcess {
     background-image: url(../Media/update.png);
     display: inline-block;
     height: 16px;

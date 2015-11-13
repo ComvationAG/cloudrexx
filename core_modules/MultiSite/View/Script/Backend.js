@@ -514,6 +514,93 @@
             });
         });
         
+        $('.websiteUpdateProcess').click(function(){
+            domainUrl = cx.variables.get('baseUrl', 'MultiSite') + 
+                        cx.variables.get('cadminPath', 'contrexx') + 
+                        "index.php?cmd=JsonData&object=MultiSite&act=";
+            var websiteId = $(this).data('id');
+            cx.jQuery.ajax({
+                url: domainUrl + 'getCodeBaseVersionsAndComponents',
+                type: "POST",
+                data: {websiteId: websiteId},
+                dataType: "json",
+                beforeSend: function () {
+                  cx.trigger("loadingStart", "multiSite", {});
+                  cx.tools.StatusMessage.showMessage("<div id=\"loading\">" + cx.jQuery('#loading').html() + "</div>");
+                  $('#loading > span').html(cx.variables.get('loadingServiceServerInfo', 'multisite/lang'));
+                },
+                success: function (response) {
+                    if (response.status == 'success') {
+                        switch (response.data.status) {
+                            case 'success':
+                                cx.tools.StatusMessage.showMessage(response.data.message, null, 2000);
+                                //websiteCodeBase versions
+                                var codeBaseDropDown =  $('<select />').attr('name', 'codeBase')
+                                                        .change(function () {
+                                                            //get components by codeBase
+                                                            getWebsitesOrComponentsByCodeBase(
+                                                                domainUrl + 'getComponentsByCodeBase', 
+                                                                {codeBase: $(this).val(), websiteId: websiteId},
+                                                                'components'
+                                                            );
+                                                          });
+                                $(response.data.codeBaseVersions).each(function (index, codeBaseVersion) {
+                                  codeBaseDropDown.append($('<option />').text(codeBaseVersion));
+                                });
+                                //dialog content
+                                var dialogContent = cx.variables.get('updateNotAvailable', 'multisite/lang');
+                                if (response.data.codeBaseVersions != '') {
+                                    dialogContent = $('<form>').attr({'id': 'websiteUpdateForm', 'name': 'frmShowEntries'})
+                                                    .append(
+                                                        $('<div/>').attr({'id': 'container'})
+                                                        .append(
+                                                            $('<div/>').attr({'class': 'row'}).append(
+                                                                $('<label/>').text(cx.variables.get('latestCodeBaseVersion', 'multisite/lang'))
+                                                            ).append(
+                                                                $('<span/>').html(codeBaseDropDown)
+                                                            ).append(
+                                                                $('<input/>').attr({'type': 'hidden', 'name': 'websites[]', 'value': websiteId})
+                                                            )
+                                                        ).append(
+                                                                $('<div/>').attr({'id' : 'componentsSection', 'class': 'row'})
+                                                        )
+                                                    )
+                                                    .submit(function () {
+                                                      var data = $(this).serialize() + '&websiteId=' + websiteId;
+                                                      var url = domainUrl + 'triggerWebsiteUpdate';
+                                                      triggerWebsiteUpdate(url, data);
+                                                      return false;
+                                                    });
+                                }
+                                cx.ui.dialog({
+                                  width: 820,
+                                  height: 400,
+                                  title: 'Update',
+                                  content: dialogContent,
+                                  autoOpen: true,
+                                  modal: true
+                                });
+                                var codeBase = $("select[name='codeBase']").val();
+                                if (codeBase != null) {
+                                    getWebsitesOrComponentsByCodeBase(domainUrl + 'getComponentsByCodeBase', 
+                                                                      {codeBase: codeBase, websiteId: websiteId},
+                                                                      'components');
+                                }
+                            break;
+                            case 'error':
+                                cx.tools.StatusMessage.showMessage(response.data.message, null, 4000);
+                            break;
+                            default:
+                            break;
+                        }
+                    } else {
+                        cx.tools.StatusMessage.showMessage(response.message, null, 4000);
+                    }
+                    cx.trigger("loadingEnd", "multiSite", {});
+                }
+            });
+        });
+
     $('.websiteUpdate').click(function () {
       domainUrl = cx.variables.get('baseUrl', 'MultiSite') + cx.variables.get('cadminPath', 'contrexx') + "index.php?cmd=JsonData&object=MultiSite&act=";
       var serviceServerId = $(this).data('id');
@@ -536,7 +623,9 @@
                 var codeBaseDropDown = $('<select />').attr('name', 'codeBase')
                                           .change(function () {
                                             //get websites by codeBase
-                                            getWebsitesByCodeBase(domainUrl, serviceServerId, $(this).val());
+                                            getWebsitesOrComponentsByCodeBase(domainUrl + 'getWebsitesByCodeBase',
+                                                                              {codeBase: $(this).val(), serviceServerId: serviceServerId},
+                                                                              'websites');
                                           });
                 $(response.data.codeBaseVersions).each(function (index, codeBaseVersion) {
                   codeBaseDropDown.append($('<option />').text(codeBaseVersion));
@@ -549,8 +638,10 @@
                 });
                 //dialog content
                 var dialogContent = cx.variables.get('updateNotAvailable', 'multisite/lang');
-                if (response.data.codeBaseVersions != '') {
-                    dialogContent = $('<form>').attr({'id': 'websiteUpdateForm', 'name': 'frmShowWebsites'})
+                if (    response.data.codeBaseVersions != ''
+                    &&  response.data.components != ''
+                ) {
+                    dialogContent = $('<form>').attr({'id': 'websiteUpdateForm', 'name': 'frmShowEntries'})
                                     .append(
                                         $('<div/>').attr({'id': 'container'})
                                         .append(
@@ -587,7 +678,9 @@
                 $('.chzn-select').chosen();
                 var codeBase = $("select[name='codeBase']").val();
                 if (codeBase != null) {
-                  getWebsitesByCodeBase(domainUrl, serviceServerId, codeBase);
+                    getWebsitesOrComponentsByCodeBase(domainUrl + 'getWebsitesByCodeBase',
+                                                      {codeBase: codeBase, serviceServerId: serviceServerId},
+                                                      'websites');
                 }
                 break;
               case 'error':
@@ -605,54 +698,57 @@
       });
     });
     
-    function getWebsitesByCodeBase(domainUrl, serviceId, codeBase) {
-      $('div').find('#websitesSection').html('<div id="loading">' + cx.variables.get('loading', 'multisite/lang') + '</div');
-      cx.jQuery.ajax({
-        url: domainUrl + 'getWebsitesByCodeBase',
+    function getWebsitesOrComponentsByCodeBase(url, data, id) {
+        $('div').find('#' + id + 'Section').html('<div id="loading">' + cx.variables.get('loading', 'multisite/lang') + '</div');
+        cx.jQuery.ajax({
+        url: url,
         type: "POST",
-        data: {codeBase: codeBase, serviceServerId: serviceId},
+        data: data,
         dataType: "json",
         success: function (response) {
-          if (response.status == 'success') {
-            //websites
-            var table = $('<table />')
-                             .addClass('adminlist')
-                             .attr({'align' : 'center', 'width' : '80%'});
-                        table.append($('<tr />')
-                             .append($('<th />').text("#"))
-                             .append($('<th />').text(cx.variables.get('websiteName', 'multisite/lang')))
-                             .append($('<th />').text(cx.variables.get('codeBase', 'multisite/lang')))
-                           );
-            $(response.data.websites).each(function (key, websites) {
-              var tableRow = ($('<tr />'));
-              $(websites).each(function (index, website) {
-                tableRow.append($('<td />').append($('<input/>').attr({'type':'checkbox', 'name':'websites[]' }).val(website.id)));
-                tableRow.append($('<td />').text(website.name));
-                tableRow.append($('<td />').text(website.codeBase));
-                table.append(tableRow);
-              });
-            });
-          }
-          var htmlElement = $('div').find('#websitesSection');
-          if (response.data.websites == '') {
-            htmlElement.html(cx.variables.get('websitesNotExist', 'multisite/lang'));
-          } else {
-            htmlElement.html(table);
-            htmlElement.append(
-                $('<div/>').attr({'class' : 'row'}).append(
-                    $('<span/>').append($('<a />')
-                                  .attr("onclick", "changeCheckboxes(\'frmShowWebsites\',\'websites[]\',true); return false;" )
-                                  .text(cx.variables.get('selectAll', 'multisite/lang') + " / ")
-                                ).append($('<a />')
-                                  .attr("onclick", "changeCheckboxes(\'frmShowWebsites\',\'websites[]\',false); return false;" )
-                                  .text(cx.variables.get('deSelectAll', 'multisite/lang'))
-                                ).append($('<input />').attr('type', 'submit').val('Update').addClass('update'))
-                )
-            );
-          }
+            if (response.status == 'success') {
+                var records = (id == 'websites') ? response.data.websites : response.data.components;
+                //websites
+                var table = $('<table />')
+                                 .addClass('adminlist')
+                                 .attr({'align' : 'center', 'width' : '80%'});
+                            table.append($('<tr />')
+                                 .append($('<th />').text("#"))
+                                 .append($('<th />').text(cx.variables.get('websiteName', 'multisite/lang')))
+                                 .append($('<th />').text(cx.variables.get('codeBase', 'multisite/lang')))
+                               );
+                $(records).each(function (key, entries) {
+                    var tableRow = ($('<tr />'));
+                    $(entries).each(function (index, entry) {
+                        var checkBoxVal = (id == 'websites') ? entry.id : entry.name;
+                        tableRow.append($('<td />').append($('<input/>').attr({'type':'checkbox', 'name': id + '[]' }).val(checkBoxVal)));
+                        tableRow.append($('<td />').text(entry.name));
+                        tableRow.append($('<td />').text(entry.codeBase));
+                        table.append(tableRow);
+                    });
+                });
+            }
+            var htmlElement = $('div').find('#' + id + 'Section');
+            if (records == '') {
+              htmlElement.html(cx.variables.get(id + 'NotExist', 'multisite/lang'));
+            } else {
+              htmlElement.html(table);
+              htmlElement.append(
+                  $('<div/>').attr({'class' : 'row'}).append(
+                      $('<span/>').append($('<a />')
+                                    .attr("onclick", "changeCheckboxes(\'frmShowEntries\',\'" + id + "[]\',true); return false;" )
+                                    .text(cx.variables.get('selectAll', 'multisite/lang') + " / ")
+                                  ).append($('<a />')
+                                    .attr("onclick", "changeCheckboxes(\'frmShowEntries\',\'" + id + "[]\',false); return false;" )
+                                    .text(cx.variables.get('deSelectAll', 'multisite/lang'))
+                                  ).append($('<input />').attr('type', 'submit').val('Update').addClass('update'))
+                  )
+              );
+            }
         }
-      });
+        });
     }
+    
         //Fetch multisite Website Configuration settings
         $('.multiSiteWebsiteConfig').click(function() {
             var title = $(this).data('title'),

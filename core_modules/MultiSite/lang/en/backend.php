@@ -524,9 +524,14 @@ $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_UPDATE_PROCESS_ERROR_MSG'] = 'Una
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_CODEBASES_COMPONENTS_ERROR_MSG'] = 'Unable to get the codebases and components list';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_WEBSITES_ERROR_MSG'] = 'Unable to get the websites';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_WEBSITES_SUCCESS_MSG'] = 'Websites are successfully fetched from the service server';
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_COMPONENTS_SUCCESS_MSG'] = 'Components are successfully fetched from the website';
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_COMPONENTS_ERROR_MSG'] = 'Unable to get the components';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_UPDATE_ERROR_MSG'] = 'Failed to update the website';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_UPDATE_STATUS_ERROR_MSG'] = 'Failed to send the update notification email';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_UPDATE_CODEBASE_ERROR_MSG'] = 'Failed to update the website codebase';
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_INVALID_WEBSITE'] = 'Invalid website requested.';
+$_ARRAYLANG['TXT_MULTISITE_NO_COMPONENTS_FOUND'] = 'Components not available.';
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_COMPONENTNAME'] = 'Component Name';
 
 //set owner user
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_CHANGE_OWNER_USER_ERROR'] = 'Error while switching the owner user';
