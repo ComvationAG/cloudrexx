@@ -514,7 +514,7 @@
             });
         });
         
-        $('.websiteUpdateProcess').click(function(){
+        $('.componentUpdate').click(function(){
             domainUrl = cx.variables.get('baseUrl', 'MultiSite') + 
                         cx.variables.get('cadminPath', 'contrexx') + 
                         "index.php?cmd=JsonData&object=MultiSite&act=";
@@ -655,6 +655,9 @@
                                                 $('<label/>').text(cx.variables.get('componentListLabel', 'multisite/lang'))
                                             ).append(
                                                 $('<span/>').html(componentDropdown)
+                                            ).append(
+                                                $('<input/>').attr({'type' : 'hidden', 'name' : 'componentsTotalCnt'})
+                                                             .val(response.data.components.length)
                                             )
                                         ).append(
                                                 $('<div/>').attr({'id' : 'websitesSection', 'class': 'row'})
@@ -707,8 +710,18 @@
         dataType: "json",
         success: function (response) {
             if (response.status == 'success') {
-                var records = (id == 'websites') ? response.data.websites : response.data.components;
-                //websites
+                var records     = (id == 'websites') ? response.data.websites : response.data.components;
+                var htmlElement = $('div').find('#' + id + 'Section');
+                if (records == '') {
+                    htmlElement.html($('<label/>').text(cx.variables.get(id + 'NotExist', 'multisite/lang')));
+                    return;
+                }
+                var componentsCount = (id == 'components') 
+                                        ? $('<input />')
+                                            .attr({'name' : 'componentsTotalCnt', 'type' : 'hidden'})
+                                            .val(records.length) 
+                                        : null;
+                //Parse the websites / components
                 var table = $('<table />')
                                  .addClass('adminlist')
                                  .attr({'align' : 'center', 'width' : '80%'});
@@ -728,23 +741,18 @@
                     });
                 });
             }
-            var htmlElement = $('div').find('#' + id + 'Section');
-            if (records == '') {
-              htmlElement.html(cx.variables.get(id + 'NotExist', 'multisite/lang'));
-            } else {
-              htmlElement.html(table);
-              htmlElement.append(
-                  $('<div/>').attr({'class' : 'row'}).append(
-                      $('<span/>').append($('<a />')
-                                    .attr("onclick", "changeCheckboxes(\'frmShowEntries\',\'" + id + "[]\',true); return false;" )
-                                    .text(cx.variables.get('selectAll', 'multisite/lang') + " / ")
-                                  ).append($('<a />')
-                                    .attr("onclick", "changeCheckboxes(\'frmShowEntries\',\'" + id + "[]\',false); return false;" )
-                                    .text(cx.variables.get('deSelectAll', 'multisite/lang'))
-                                  ).append($('<input />').attr('type', 'submit').val('Update').addClass('update'))
-                  )
-              );
-            }
+            htmlElement.html(table);
+            htmlElement.append(
+                $('<span/>').attr({'class' : 'links'})
+                            .append($('<a />')
+                              .attr("onclick", "changeCheckboxes(\'frmShowEntries\',\'" + id + "[]\',true); return false;" )
+                              .text(cx.variables.get('selectAll', 'multisite/lang') + " / ")
+                            ).append($('<a />')
+                              .attr("onclick", "changeCheckboxes(\'frmShowEntries\',\'" + id + "[]\',false); return false;" )
+                              .text(cx.variables.get('deSelectAll', 'multisite/lang'))
+                            ).append($('<input />').attr('type', 'submit').val('Update').addClass('update'))
+            );
+            htmlElement.append(componentsCount);
         }
         });
     }

@@ -79,7 +79,7 @@ a.websiteBackup {
     cursor: pointer;
 }
 
-a.websiteUpdate, a.websiteUpdateProcess {
+a.websiteUpdate, a.componentUpdate {
     background-image: url(../Media/update.png);
     display: inline-block;
     height: 16px;
@@ -90,8 +90,12 @@ a.websiteUpdate, a.websiteUpdateProcess {
 }
 
 #websiteUpdateForm{
-      padding: 75px 180px;
-      text-align: center;
+    padding: 75px 180px;
+    text-align: center;
+}
+#websiteUpdateForm span.links {
+    width: 100% !important;
+    padding-top: 10px;
 }
 #websiteUpdateForm #container{ height: auto;}
 #websiteUpdateForm .row {

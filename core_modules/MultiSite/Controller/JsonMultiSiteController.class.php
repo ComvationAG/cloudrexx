@@ -6649,8 +6649,8 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
         try {
             switch (\Cx\Core\Setting\Controller\Setting::getValue('mode', 'MultiSite')) {
                 case ComponentController::MODE_MANAGER:
-                    $serviceServerId = isset($params['post']['serviceServerId']) ? $params['post']['serviceServerId'] : 0;
-                    $websiteId       = isset($params['post']['websiteId']) ? $params['post']['websiteId'] : 0;
+                    $serviceServerId = isset($params['post']['serviceServerId']) ? contrexx_input2int($params['post']['serviceServerId']) : 0;
+                    $websiteId       = isset($params['post']['websiteId']) ? contrexx_input2int($params['post']['websiteId']) : 0;
                     $websiteServiceServer = null;
                     if (!empty($websiteId)) {
                         $em          = $this->cx->getDb()->getEntityManager();
@@ -6678,11 +6678,13 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                         \DBG::msg('JsonMultiSiteController::triggerWebsiteUpdate() failed: Insufficient arguments supplied: ' . var_export($params, true));
                         throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_UPDATE_PROCESS_ERROR_MSG']);
                     }
+                    $componentCnt      = isset($params['post']['componentsTotalCnt']) ? contrexx_input2int($params['post']['componentsTotalCnt']) : 0;
+                    $componentSelected = isset($params['post']['components']) ? array_map('contrexx_input2raw', $params['post']['components']) : array();
+                    $isWebsiteUpdate   = ($componentCnt == count($componentSelected) || empty($componentSelected)) ? true : false;
                     $ymlContent = array(
                                     'codeBase'   => $params['post']['codeBase'],
                                     'websites'   => $params['post']['websites'],
-                                    'components' => $params['post']['components'],
-                                  );
+                                    'components' => $componentSelected);
                     try {
                         $updateController = $this->getComponent('Update') ? $this->getComponent('Update')->getController('Update') : null;
                         if (!$updateController) {
@@ -6698,9 +6700,10 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                         $codeBase   = $pendingCodeBaseChanges['PendingCodeBaseChanges']['codeBase'];
                         $components = $pendingCodeBaseChanges['PendingCodeBaseChanges']['components'];
                         \Cx\Core\Setting\Controller\Setting::init('Config', '', 'Yaml');
-                        $params = array('codeBase'     => $codeBase,
-                                        'components'   => $components,
-                                        'codeBasePath' => \Cx\Core\Setting\Controller\Setting::getValue('codeBaseRepository', 'MultiSite'),
+                        $params = array('codeBase'        => $codeBase,
+                                        'components'      => $components,
+                                        'isWebsiteUpdate' => $isWebsiteUpdate,
+                                        'codeBasePath'    => \Cx\Core\Setting\Controller\Setting::getValue('codeBaseRepository', 'MultiSite'),
                                         'serviceServerCodeBase' => \Cx\Core\Setting\Controller\Setting::getValue('coreCmsVersion', 'Config')    
                         );
                  
@@ -6715,7 +6718,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                                 $this->websiteBackup($arg);
                                 self::executeCommandOnWebsite('websiteUpdate', $params, $website, array(), true);
                             }
-                            if (empty($components)) {
+                            if ($isWebsiteUpdate) {
                                 //Update the Website CodeBase in manager
                                 self::executeCommandOnManager('updateWebsiteCodeBase', array('websiteIds' => $websites, 'codeBase' => $codeBase));
                             }
@@ -6783,12 +6786,14 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                     $components = contrexx_input2raw($params['post']['components']);
                     $folderPath = $this->cx->getWebsiteTempPath() . '/Update';
                     $filePath   = $folderPath .'/'. $updateController->getPendingCodeBaseChangesFile();
+                    $isWebsiteUpdate = contrexx_input2int($params['post']['isWebsiteUpdate']);
                     $ymlContent = array(
                                         'components'       => $components,
                                         'oldCodeBaseId'    => $oldVersion,
-                                        'latestCodeBaseId' => $latestCodeBase);
+                                        'latestCodeBaseId' => $latestCodeBase,
+                                        'isWebsiteUpdate'  => $isWebsiteUpdate);
                     $installationRootPath = contrexx_input2raw($params['post']['codeBasePath']) . '/' . $latestCodeBase;
-                    if (empty($components)) {
+                    if ($isWebsiteUpdate) {
                         //upadate codeBase
                         $updateController->updateCodeBase($latestCodeBase, $installationRootPath);
                     }
@@ -6797,7 +6802,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                     $updateController->storeUpdateWebsiteDetailsToYml($folderPath, $filePath, $ymlContent );
 
                     //create Pending Db Update list in yml using the Delta object
-                    $ymlContent['codeBasePath'] = !empty($components) ? $this->cx->getCodeBasePath() : $installationRootPath;
+                    $ymlContent['codeBasePath'] = !$isWebsiteUpdate ? $this->cx->getCodeBasePath() : $installationRootPath;
                     $updateController->calculateDbDelta($ymlContent);
  
                     //set website back to online mode

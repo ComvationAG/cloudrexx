@@ -692,7 +692,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 'actions' => function($rowData) {
                                 if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
                                     //add the 'websiteUpdate' action to update a website or single/multiple component
-                                    $actions  = '<a href="javascript:void(0);" class = "websiteUpdateProcess" data-id = '.$rowData['id'].' title = "update" ></a>';
+                                    $actions  = '<a href="javascript:void(0);" class = "componentUpdate" data-id = '.$rowData['id'].' title = "update" ></a>';
                                     //add the 'executeSql' action to run the sql query in the corresponding website
                                     $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::executeSql($rowData, false);
                                     //add the 'showLicense' action to show and edit the website license
