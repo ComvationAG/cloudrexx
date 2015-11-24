@@ -163,9 +163,9 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
             'checkAvailabilityOfAffiliateId' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
             'setAffiliate'        => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
             'sendNotificationForPayoutRequest' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
-            'getCodeBaseVersionsAndComponents' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'checkAuthenticationByMode')),
+            'getCodeBaseVersions' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'checkAuthenticationByMode')),
+            'getWebsiteCodeBase' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'checkAuthenticationByMode')),
             'getWebsitesByCodeBase' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'checkAuthenticationByMode')),
-            'getComponentsByCodeBase' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'checkAuthenticationByMode')),
             'triggerWebsiteUpdate' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'checkAuthenticationByMode')),
             'websiteUpdate' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
             'sendUpdateNotification' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
@@ -6574,7 +6574,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
      * @return array JsonData-response
      * @throws MultiSiteJsonException
      */
-    public function getCodeBaseVersionsAndComponents($params) {
+    public function getCodeBaseVersions($params) {
         global $_ARRAYLANG;
         try {
             self::loadLanguageData();
@@ -6583,8 +6583,8 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                     if (    empty($params['post']['serviceServerId'])
                         &&  empty($params['post']['websiteId'])
                     ) {
-                        \DBG::msg('JsonMultiSiteController::getCodeBaseVersionsAndComponents() failed: Insufficient arguments supplied: ' . var_export($params, true));
-                        throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_CODEBASES_COMPONENTS_ERROR_MSG']);
+                        \DBG::msg('JsonMultiSiteController::getCodeBaseVersions() failed: Insufficient arguments supplied: ' . var_export($params, true));
+                        throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_CODEBASES_ERROR_MSG']);
                     }
 
                     $serviceServerId = isset($params['post']['serviceServerId']) ? $params['post']['serviceServerId'] : 0;
@@ -6603,12 +6603,11 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                         throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_INVALID_SERVICE_SERVER']);
                     }
 
-                    $response = self::executeCommandOnServiceServer('getCodeBaseVersionsAndComponents', array(), $websiteServiceServer);
+                    $response = self::executeCommandOnServiceServer('getCodeBaseVersions', array(), $websiteServiceServer);
                     if ($response && $response->status = 'success') {
                         return array('status' => 'success',
                                      'message' => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_SERVICE_SERVER_CODEBASE_REQUEST_SUCCESS'],
-                                     'codeBaseVersions' => $response->data->codeBaseVersions,
-                                     'components'       => $response->data->components);
+                                     'codeBaseVersions' => $response->data->codeBaseVersions);
                     }
                     break;
                 case ComponentController::MODE_SERVICE:
@@ -6623,14 +6622,13 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                     rsort($codeBaseVersions);
                     return array('status' => 'success',
                                 'message' => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_SERVICE_SERVER_CODEBASE_REQUEST_SUCCESS'],
-                                'codeBaseVersions' => $codeBaseVersions,
-                                'components' => $updateController->getAllComponentList());
+                                'codeBaseVersions' => $codeBaseVersions);
                     break;
             }
-            return array('status' => 'error', 'message' => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_CODEBASES_COMPONENTS_ERROR_MSG']);
+            return array('status' => 'error', 'message' => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_CODEBASES_ERROR_MSG']);
         } catch (\Exception $e) {
             \DBG::msg($e->getMessage());
-            throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_CODEBASES_COMPONENTS_ERROR_MSG']);
+            throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_CODEBASES_ERROR_MSG']);
         }
     }
     
@@ -6678,13 +6676,9 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                         \DBG::msg('JsonMultiSiteController::triggerWebsiteUpdate() failed: Insufficient arguments supplied: ' . var_export($params, true));
                         throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_UPDATE_PROCESS_ERROR_MSG']);
                     }
-                    $componentCnt      = isset($params['post']['componentsTotalCnt']) ? contrexx_input2int($params['post']['componentsTotalCnt']) : 0;
-                    $componentSelected = isset($params['post']['components']) ? array_map('contrexx_input2raw', $params['post']['components']) : array();
-                    $isWebsiteUpdate   = ($componentCnt == count($componentSelected) || empty($componentSelected)) ? true : false;
                     $ymlContent = array(
                                     'codeBase'   => $params['post']['codeBase'],
-                                    'websites'   => $params['post']['websites'],
-                                    'components' => $componentSelected);
+                                    'websites'   => $params['post']['websites']);
                     try {
                         $updateController = $this->getComponent('Update') ? $this->getComponent('Update')->getController('Update') : null;
                         if (!$updateController) {
@@ -6698,11 +6692,8 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                         $pendingCodeBaseChanges = $updateController->getUpdateWebsiteDetailsFromYml($filePath);
                         $websites   = $pendingCodeBaseChanges['PendingCodeBaseChanges']['websites'];
                         $codeBase   = $pendingCodeBaseChanges['PendingCodeBaseChanges']['codeBase'];
-                        $components = $pendingCodeBaseChanges['PendingCodeBaseChanges']['components'];
                         \Cx\Core\Setting\Controller\Setting::init('Config', '', 'Yaml');
                         $params = array('codeBase'        => $codeBase,
-                                        'components'      => $components,
-                                        'isWebsiteUpdate' => $isWebsiteUpdate,
                                         'codeBasePath'    => \Cx\Core\Setting\Controller\Setting::getValue('codeBaseRepository', 'MultiSite'),
                                         'serviceServerCodeBase' => \Cx\Core\Setting\Controller\Setting::getValue('coreCmsVersion', 'Config')    
                         );
@@ -6718,10 +6709,8 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                                 $this->websiteBackup($arg);
                                 self::executeCommandOnWebsite('websiteUpdate', $params, $website, array(), true);
                             }
-                            if ($isWebsiteUpdate) {
-                                //Update the Website CodeBase in manager
-                                self::executeCommandOnManager('updateWebsiteCodeBase', array('websiteIds' => $websites, 'codeBase' => $codeBase));
-                            }
+                            //Update the Website CodeBase in manager
+                            self::executeCommandOnManager('updateWebsiteCodeBase', array('websiteIds' => $websites, 'codeBase' => $codeBase));
                             //Send update status as email to Admin
                             self::executeCommandOnManager('sendUpdateNotification', array('websiteIds' => $websites, 'emailTemplateKey' => 'notification_update_status_email'));
                         }
@@ -6783,26 +6772,19 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                     \Cx\Core\Setting\Controller\Setting::set('websiteState', \Cx\Core_Modules\MultiSite\Model\Entity\Website::STATE_OFFLINE);
                     \Cx\Core\Setting\Controller\Setting::update('websiteState');
 
-                    $components = contrexx_input2raw($params['post']['components']);
                     $folderPath = $this->cx->getWebsiteTempPath() . '/Update';
                     $filePath   = $folderPath .'/'. $updateController->getPendingCodeBaseChangesFile();
-                    $isWebsiteUpdate = contrexx_input2int($params['post']['isWebsiteUpdate']);
-                    $ymlContent = array(
-                                        'components'       => $components,
-                                        'oldCodeBaseId'    => $oldVersion,
-                                        'latestCodeBaseId' => $latestCodeBase,
-                                        'isWebsiteUpdate'  => $isWebsiteUpdate);
+                    $ymlContent = array('oldCodeBaseId'    => $oldVersion,
+                                        'latestCodeBaseId' => $latestCodeBase);
                     $installationRootPath = contrexx_input2raw($params['post']['codeBasePath']) . '/' . $latestCodeBase;
-                    if ($isWebsiteUpdate) {
-                        //upadate codeBase
-                        $updateController->updateCodeBase($latestCodeBase, $installationRootPath);
-                    }
+                    //upadate codeBase
+                    $updateController->updateCodeBase($latestCodeBase, $installationRootPath);
                     
                     //create a yml file and store the current & latest codeBase and components list
                     $updateController->storeUpdateWebsiteDetailsToYml($folderPath, $filePath, $ymlContent );
 
                     //create Pending Db Update list in yml using the Delta object
-                    $ymlContent['codeBasePath'] = !$isWebsiteUpdate ? $this->cx->getCodeBasePath() : $installationRootPath;
+                    $ymlContent['codeBasePath'] = $installationRootPath;
                     $updateController->calculateDbDelta($ymlContent);
  
                     //set website back to online mode
@@ -6951,83 +6933,55 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
     }
 
     /**
-     * Get the components by codebase
+     * Get the website codebase
      * 
-     * @param type $params supplied arguments from JsonData-request
-     * @staticvar type $objYaml
+     * @param array $params supplied arguments from JsonData-request
      * 
      * @return array JsonData-response
      * @throws MultiSiteJsonException
      */
-    public function getComponentsByCodeBase($params)
+    public function getWebsiteCodeBase($params)
     {
         global $_ARRAYLANG;
 
         try {
             self::loadLanguageData();
-            //check the post values
-            if (    empty($params['post']) 
-                ||  !isset($params['post']['codeBase'])
-            ) {
-                \DBG::msg('JsonMultiSiteController::getComponentsByCodeBase() failed: Insufficient arguments supplied: ' . var_export($params, true));
-                throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_COMPONENTS_ERROR_MSG']);
+            if (empty($params['post']) || !isset($params['post']['websiteId'])) {
+                \DBG::msg('JsonMultiSiteController::getWebsiteCodeBase() failed: Insufficient arguments supplied: ' . var_export($params, true));
+                throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_WEBSITE_CODEBASE_ERROR_MSG']);
             }
-            
-            $em = $this->cx->getDb()->getEntityManager();
-            $codeBase = isset($params['post']['codeBase']) ? contrexx_input2raw($params['post']['codeBase']) : '';
+            $websiteId   = contrexx_input2raw($params['post']['websiteId']);
+            $em          = $this->cx->getDb()->getEntityManager();
+            $websiteRepo = $em->getRepository('Cx\Core_Modules\MultiSite\Model\Entity\Website');
+            $website     = $websiteRepo->findOneById($websiteId);
             switch (\Cx\Core\Setting\Controller\Setting::getValue('mode', 'MultiSite')) {
                 case ComponentController::MODE_MANAGER:
-                case ComponentController::MODE_HYBRID:
-                    $websiteId   = isset($params['post']['websiteId']) ? contrexx_input2raw($params['post']['websiteId']) : '';
-                    $websiteRepo = $em->getRepository('Cx\Core_Modules\MultiSite\Model\Entity\Website');
-                    $website     = $websiteRepo->findOneById($websiteId);
-                    if (!$website) {
-                        throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_INVALID_WEBSITE']);
+                    $websiteServiceServer = $website ? $website->getWebsiteServiceServer() : null;
+                    if (!$websiteServiceServer) {
+                        throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_INVALID_SERVICE_SERVER']);
                     }
-                    $response = self::executeCommandOnWebsite('getComponentsByCodeBase', array('codeBase' => $codeBase), $website);
-                    if ($response && $response->status = 'success') {
-                        return array('status' => 'success', 'message' => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_COMPONENTS_SUCCESS_MSG'], 'components' => $response->data->components);
+                    $response = self::executeCommandOnServiceServer('getWebsiteCodeBase', $params['post'], $websiteServiceServer);
+                    if ($response && $response->status == 'success') {
+                        return array('status' => 'success', 'codeBase' => $response->data->codeBase);
                     }
                     break;
-                case ComponentController::MODE_WEBSITE:
-                    static $objYaml = null;
-                    
-                    if (!isset($objYaml)) {
-                        $objYaml = new \Symfony\Component\Yaml\Yaml();
+                case ComponentController::MODE_SERVICE:
+                case ComponentController::MODE_HYBRID:
+                    if (!$website) {
+                        throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_WEBSITE_CODEBASE_ERROR_MSG']);
                     }
-                    $componentList = array();
-                    $componentRepo = $em->getRepository('\Cx\Core\Core\Model\Entity\SystemComponent');
-                    $components    = $componentRepo->findAll();
                     \Cx\Core\Setting\Controller\Setting::init('Config', '', 'Yaml');
-                    $websiteCodeBase = \Cx\Core\Setting\Controller\Setting::getValue('coreCmsVersion', 'Config');
-                    foreach ($components as $component) {
-                        if (!file_exists($component->getDirectory())) {
-                            continue;
-                        }
-                        $content = array();
-                        if (file_exists($component->getDirectory() . '/meta.yml')) {
-                            $file    = new \Cx\Lib\FileSystem\File($component->getDirectory() . '/meta.yml');
-                            $content = $objYaml->load($file->getData());
-                        }
-                        
-                        $componentCodebase = (isset($content['DlcInfo']) && !empty($content['DlcInfo']['version'])) 
-                                                ? $content['DlcInfo']['version'] : $websiteCodeBase;
-                        if ($codeBase != $componentCodebase) {
-                            $componentList[] = array(
-                                'name'     => $component->getName(),
-                                'codeBase' => $componentCodebase
-                            );
-                        }
-                    }
-                    return array('status' => 'success', 'components' => $componentList);
+                    $serviceCodeBase = \Cx\Core\Setting\Controller\Setting::getValue('coreCmsVersion', 'Config');
+                    $websiteCodeBase = \FWValidator::isEmpty($website->getCodeBase()) ? $serviceCodeBase : $website->getCodeBase();
+                    return array('status' => 'success', 'codeBase' => $websiteCodeBase);
                     break;
             }
         } catch (\Exception $e) {
-            \DBG::msg($e->getMessage());
-            throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_COMPONENTS_ERROR_MSG']);
+            \DBG::dump($e->getMessage());
+            throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_WEBSITE_CODEBASE_ERROR_MSG']);
         }
     }
-
+    
     /**
      * Get the websites by codeBase
      * 

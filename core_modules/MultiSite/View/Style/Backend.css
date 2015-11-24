@@ -79,7 +79,7 @@ a.websiteBackup {
     cursor: pointer;
 }
 
-a.websiteUpdate, a.componentUpdate {
+a.updateFromService, a.updateFromWebsite {
     background-image: url(../Media/update.png);
     display: inline-block;
     height: 16px;
