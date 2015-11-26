@@ -6772,21 +6772,17 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                     \Cx\Core\Setting\Controller\Setting::set('websiteState', \Cx\Core_Modules\MultiSite\Model\Entity\Website::STATE_OFFLINE);
                     \Cx\Core\Setting\Controller\Setting::update('websiteState');
 
-                    $folderPath = $this->cx->getWebsiteTempPath() . '/Update';
-                    $filePath   = $folderPath .'/'. $updateController->getPendingCodeBaseChangesFile();
-                    $ymlContent = array('oldCodeBaseId'    => $oldVersion,
-                                        'latestCodeBaseId' => $latestCodeBase);
                     $installationRootPath = contrexx_input2raw($params['post']['codeBasePath']) . '/' . $latestCodeBase;
                     //upadate codeBase
                     $updateController->updateCodeBase($latestCodeBase, $installationRootPath);
-                    
-                    //create a yml file and store the current & latest codeBase and components list
-                    $updateController->storeUpdateWebsiteDetailsToYml($folderPath, $filePath, $ymlContent );
 
-                    //create Pending Db Update list in yml using the Delta object
-                    $ymlContent['codeBasePath'] = $installationRootPath;
-                    $updateController->calculateDbDelta($ymlContent);
- 
+                    //Trigger the update process
+                    $params = array(
+                        'oldCodeBaseId'    => $oldVersion,
+                        'latestCodeBaseId' => $latestCodeBase,
+                        'codeBasePath'     => $installationRootPath);
+                    $updateController->triggerUpdate($params);
+
                     //set website back to online mode
                     \Cx\Core\Setting\Controller\Setting::init('MultiSite', '', 'FileSystem');
                     \Cx\Core\Setting\Controller\Setting::set('websiteState', \Cx\Core_Modules\MultiSite\Model\Entity\Website::STATE_ONLINE);
