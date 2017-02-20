@@ -5293,29 +5293,39 @@ $WhereStatement = '';
             }
         }
 
-        if (isset($_GET["bulkdelete"])) {
-            $error = 0;
-            if (!empty($_POST['userid'])) {
-                foreach ($_POST['userid'] as $userid) {
-                    $userid=intval($userid);
+        $multiAction = !empty($_POST['userlist_MultiAction']) ? contrexx_input2raw($_POST['userlist_MultiAction']) : 0;
+        $userIds     = !empty($_POST['userid']) ? array_map('contrexx_input2int', $_POST['userid']) : array();
+        $multiActionError   = 0;
+        $multiActionMessage = '';
+        switch ($multiAction) {
+            case 'delete':
+                foreach ($userIds as $userid) {
                     if (!$this->_deleteRecipient($userid)) {
-                        $error = 1;
+                        $multiActionError = 1;
                     }
                 }
-            }
-/*
-            if (!empty($_POST['accessUserid'])) {
-                foreach ($_POST['accessUserid'] as $userID) {
-                    if ($this->removeAccessRecipient($userID)) {
-                        $error = 1;
-                    }
+                $multiActionMessage =   $multiActionError
+                                      ? $_ARRAYLANG['TXT_DATA_RECORD_DELETE_ERROR']
+                                      : $_ARRAYLANG['TXT_DATA_RECORD_DELETED_SUCCESSFUL'];
+                break;
+            case 'activate':
+            case 'deactivate':
+                if (!$this->changeRecipientStatus($userIds, $multiAction == 'activate')) {
+                    $multiActionError = 1;
                 }
-            }
-*/
-            if ($error) {
-                self::$strErrMessage = $_ARRAYLANG['TXT_DATA_RECORD_DELETE_ERROR'];
+                $multiActionMessage =   $multiActionError
+                                      ? $_ARRAYLANG['TXT_NEWSLETTER_USERS_'. strtoupper($multiAction) .'_ERROR']
+                                      : $_ARRAYLANG['TXT_NEWSLETTER_USERS_'. strtoupper($multiAction) .'_SUCCESS'];
+                break;
+            default:
+                break;
+        }
+
+        if ($userIds && $multiAction) {
+            if ($multiActionError) {
+                self::$strErrMessage = $multiActionMessage;
             } else {
-                self::$strOkMessage = $_ARRAYLANG['TXT_DATA_RECORD_DELETED_SUCCESSFUL'];
+                self::$strOkMessage = $multiActionMessage;
             }
         }
 
@@ -5355,7 +5365,9 @@ $WhereStatement = '';
             'TXT_ADD' => $_ARRAYLANG['TXT_ADD'],
             'TXT_IMPORT' => $_ARRAYLANG['TXT_IMPORT'],
             'TXT_EXPORT' => $_ARRAYLANG['TXT_EXPORT'],
-            'TXT_FUNCTIONS' => $_CORELANG['TXT_FUNCTIONS']
+            'TXT_FUNCTIONS' => $_CORELANG['TXT_FUNCTIONS'],
+            'TXT_NEWSLETTER_ACTIVATE'   => $_ARRAYLANG['TXT_NEWSLETTER_ACTIVATE'],
+            'TXT_NEWSLETTER_DEACTIVATE' => $_ARRAYLANG['TXT_NEWSLETTER_DEACTIVATE'],
         ));
         $this->_objTpl->setGlobalVariable(array(
             'TXT_NEWSLETTER_MODIFY_RECIPIENT' => $_ARRAYLANG['TXT_NEWSLETTER_MODIFY_RECIPIENT'],
@@ -5647,10 +5659,14 @@ function DeleteUser(UserID, email) {
 function MultiAction() {
   with (document.userlist) {
     switch (userlist_MultiAction.value) {
-      case "delete":
-        if (confirm(\''.$_ARRAYLANG['TXT_NEWSLETTER_CONFIRM_DELETE_SELECTED_RECIPIENTS'].'\n'.$_ARRAYLANG['TXT_NEWSLETTER_CANNOT_UNDO_OPERATION'].'\')) {
-          submit();
-        }
+        case "activate":
+        case "deactivate":
+            submit();
+            break;
+        case "delete":
+            if (confirm(\''.$_ARRAYLANG['TXT_NEWSLETTER_CONFIRM_DELETE_SELECTED_RECIPIENTS'].'\n'.$_ARRAYLANG['TXT_NEWSLETTER_CANNOT_UNDO_OPERATION'].'\')) {
+              submit();
+            }
         break;
     }
   }

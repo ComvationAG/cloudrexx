@@ -636,6 +636,36 @@ class NewsletterLib
     }
 
     /**
+     * Change the recipient status
+     *
+     * @param array     $userIds  Array of user id's
+     * @param boolean   $status   True to activate the users, False to deactivate
+     *
+     * @return boolean  True when status changed successfully, False otherwise
+     */
+    public function changeRecipientStatus($userIds, $status = true)
+    {
+        global $objDatabase;
+
+        if (empty($userIds)) {
+            return false;
+        }
+        $userStatus = $status ? 1 : 0;
+        $query = 'UPDATE
+            `'.DBPREFIX.'module_newsletter_user`
+        SET
+            `status` = '. $userStatus .'
+        WHERE
+            `id` IN ("'. implode('", "', contrexx_raw2db($userIds)) .'")';
+
+        $result = $objDatabase->Execute($query);
+        if ($result == false) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Create and select the date dropdowns for choosing the birthday
      *
      * @param (array|string) $birthday

@@ -45,10 +45,23 @@ namespace Cx\Modules\Newsletter\Controller;
  * @subpackage  module_newsletter
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
+
+    /**
+     * Returns all Controller class names for this component
+     *
+     * @return array List of Controller class names
+     */
     public function getControllerClasses() {
-        // Return an empty array here to let the component handler know that there
-        // does not exist a backend, nor a frontend controller of this component.
-        return array();
+        return array('JsonNewsletter');
+    }
+
+    /**
+     * Returns a list of JsonAdapter class names
+     *
+     * @return array List of ComponentController classes
+     */
+    public function getControllersAccessableByJson() {
+        return array('JsonNewsletterController');
     }
 
      /**

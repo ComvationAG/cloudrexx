@@ -494,4 +494,9 @@ $_ARRAYLANG['TXT_NEWSLETTER_MAIL_SENT_TO_RECIPIENTS'] = 'Die E-Mail-Kampagne wur
 $_ARRAYLANG['TXT_NEWSLETTER_MAIL_NOT_SENT_TO_RECIPIENTS'] = 'An <strong>%s Teilnehmer</strong> konnte die E-Mail-Kampagne nicht zugestellt werden.';
 $_ARRAYLANG['TXT_NEWSLETTER_INFO_ABOUT_ASSOCIATED_LISTS_SEND'] = "Die E-Mail-Kampagne kann direkt an die Mitglieder einer Benutzergruppe zugestellt werden.<br /><br /><strong>ACHTUNG:</strong><br />Die Mitglieder einer Benutzergruppen haben sich nicht via Double-Opt-in in eine Verteilerliste eingetragen.<br />Bitte beachten Sie daher, dass die Zustellung einer E-Mail-Kampagne an eine Benutzergruppe in bestimmten Ländern <u>gesetzeswidrig</u> ist.<br />Verwenden Sie die Zustellung an eine Benutzergruppe <u>nicht zu Werbezwecken</u>, sondern nur zum Versand einer wichtigen Mitteilung an Ihre Mitglieder.<br />In einer solch versendeten E-Mail-Kampagne steht den empfängern <u>kein Profil- und Austragungslink</u> zur Verfügung.";
 $_ARRAYLANG['TXT_NEWSLETTER_COPY_RECIPIENT'] = "Use as template for new users";
-?>
+$_ARRAYLANG['TXT_NEWSLETTER_USERS_ACTIVATE_SUCCESS'] = 'Successfully activated selected recipient(s)';
+$_ARRAYLANG['TXT_NEWSLETTER_USERS_ACTIVATE_ERROR'] = 'Unable to activate selected recipient(s)';
+$_ARRAYLANG['TXT_NEWSLETTER_USERS_DEACTIVATE_SUCCESS'] = 'Successfully deactivated selected recipient(s)';
+$_ARRAYLANG['TXT_NEWSLETTER_USERS_DEACTIVATE_ERROR'] = 'Unable to deactivate selected recipient(s)';
+$_ARRAYLANG['TXT_NEWSLETTER_USER_STATUS_CHANGE_SUCCESS'] = 'Recipient status changed successfully';
+$_ARRAYLANG['TXT_NEWSLETTER_USER_STATUS_CHANGE_ERROR'] = 'Unable to change status of recipient';

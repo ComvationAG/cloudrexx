@@ -22,6 +22,7 @@ var cxDataList = function() {
     var htmlAEditAccess = '<a href="index.php?cmd=Access&act=user&tpl=modify&id=[id]&source=newsletter" title="{TXT_NEWSLETTER_MODIFY_RECIPIENT}"></a>';
     var htmlADelete = '<a href="javascript:void(0)" onclick="DeleteUser([id],\'[email]\')" title="{TXT_NEWSLETTER_DELETE_RECIPIENT}"></a>';
     var htmlUserFunctions = '<td style="text-align:right;"></td>';
+    var htmlUserStatus = '<a data-user-id="[id]" data-user-status="[status]" onclick="newsletterList.changeStatus($J(this))" href="javascript:void(0);"></a>';
     var htmlImageLedRed = '<img src="../core/Core/View/Media/icons/led_red.gif" title="{TXT_OPEN_ISSUE}" alt="{TXT_OPEN_ISSUE}" border="0" />';
     var htmlImageLedGreen = '<img src="../core/Core/View/Media/icons/led_green.gif" title="{TXT_ACTIVE}" alt="{TXT_ACTIVE}" border="0" />';
     var htmlImageEdit = '<img src="../core/Core/View/Media/icons/edit.gif" title="{TXT_NEWSLETTER_MODIFY_RECIPIENT}" alt="{TXT_NEWSLETTER_MODIFY_RECIPIENT}" border="0" />';
@@ -158,8 +159,14 @@ var cxDataList = function() {
             }
 
             recipientRow = $(htmlRow.replace('[i]',(i%2)+1));
-            recipientRow.append($(htmlTd).append($(htmlInput.replace('[id]', user.id)))
-                                          .append(user.status == '1' ? $(htmlImageLedGreen) : $(htmlImageLedRed)));
+            recipientRow.append(
+                $(htmlTd).append($(htmlInput.replace('[id]', user.id)))
+                         .append(
+                           $(htmlUserStatus.replace('[id]', user.id).replace('[status]', user.status)).append(
+                                user.status == '1' ? $(htmlImageLedGreen) : $(htmlImageLedRed)
+                           )
+                         )
+                );
             recipientRow.append($(htmlTd).append(user.email));
             recipientRow.append($(htmlTd).append(user.company));
             recipientRow.append($(htmlTd).append(user.lastname));
@@ -184,6 +191,37 @@ var cxDataList = function() {
         setFilterParamsInUrl();
     }
 
+    var lock = function() {
+        $("#newsletter-load-lock").show();
+    };
+    var unlock = function() {
+        $("#newsletter-load-lock").hide();
+    };
+    cx.bind("loadingStart", lock, "newsletter");
+    cx.bind("loadingEnd", unlock, "newsletter");
+    var changeStatus = function(elm) {
+        var userId    = elm.data('userId'),
+            newStatus = elm.data('userStatus') === 1 ? 0 : 1,
+            that      = elm;
+        cx.trigger("loadingStart", "newsletter", {});
+        $.post(
+            cx.variables.get('cadminPath', 'contrexx') + "index.php?cmd=JsonData&object=Newsletter&act=setUserStatus",
+            {id : userId, status : newStatus},
+            function(res) {
+                var message = '';
+                if (res.status === 'success') {
+                    that.data('userStatus', newStatus);
+                    that.html(newStatus === 1 ? $(htmlImageLedGreen) : $(htmlImageLedRed));
+                    message = res.data.message;
+                } else {
+                    message = res.message;
+                }
+                cx.trigger("loadingEnd", "newsletter", {});
+                cx.tools.StatusMessage.showMessage(message, null, 2000);
+            },
+            'json'
+        );
+    };
 
     var registerSortButtons = function() {
         $('a[name^=listSort]').each(
@@ -318,7 +356,8 @@ var cxDataList = function() {
         lastPage: lastPageFunc,
         setEntryLimit: setEntryLimitFunc,
         setList: setListFunc,
-        search: searchFunc
+        search: searchFunc,
+        changeStatus : changeStatus
     }
 }
 
@@ -329,9 +368,30 @@ var confirmDeleteInactive = function() {
 }
 //]]>
 </script>
+<style type="text/css">
+    #newsletter-user-container {
+        position: relative;
+        float: left;
+        width: 100%;
+        height: 100%;
+        padding-bottom: 70px;
+    }
+    #newsletter-load-lock {
+        position: absolute;
+        opacity: 0.5;
+        background-color: white;
+        display: none;
+        z-index: 500;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+    }
+</style>
 
 {JAVASCRIPTCODE}
 
+<div id="newsletter-user-container">
 <table width="100%" border="0" cellpadding="3" cellspacing="0" class="adminlist">
     <tr>
         <th>{TXT_TITLE}</th>
@@ -358,7 +418,7 @@ var confirmDeleteInactive = function() {
     <div class="paging"></div>
     <br />
 
-    <form name="userlist" action="index.php?cmd=Newsletter&amp;act=users&amp;bulkdelete=1" method="post">
+    <form name="userlist" action="index.php?cmd=Newsletter&amp;act=users" method="post">
         <table id="tbluserlist" width="100%" border="0" cellpadding="3" cellspacing="0" class="adminlist">
             <thead>
                 <tr>
@@ -415,6 +475,8 @@ var confirmDeleteInactive = function() {
             <select name="userlist_MultiAction" onchange="MultiAction();">
                 <option value="0">{TXT_NEWSLETTER_WITH_SELECTED}:</option>
                 <option value="delete">{TXT_NEWSLETTER_DELETE}</option>
+                <option value="activate">{TXT_NEWSLETTER_ACTIVATE}</option>
+                <option value="deactivate">{TXT_NEWSLETTER_DEACTIVATE}</option>
             </select>
         </div>
     </form>
@@ -427,3 +489,5 @@ var confirmDeleteInactive = function() {
     <div class="paging"></div>
 </div>
 <!-- END module_newsletter_user_overview.html -->
+<div id="newsletter-load-lock"></div>
+</div>
