@@ -102,11 +102,3 @@ $_ARRAYLANG['TXT_ACCESS_SAVE'] = "Gem";
 $_ARRAYLANG['TXT_ACCESS_USER_ACCOUNT_STORED_SUCCESSFULLY'] = "Brugerkontoen er blevet gemt med succes";
 $_ARRAYLANG['TXT_ACCESS_CAPTCHA_DESCRIPTION'] = "Indstast venligst de viste tegn i tekstfeltet. Dette er nødvendig for at beskytte systemet mod spam.";
 $_ARRAYLANG['TXT_ACCESS_INVALID_CAPTCHA_CODE'] = "Den intastede tegnfølge var falsk!";
-$_ARRAYLANG['TXT_ACCESS_ACCEPT_TOS'] = "I confirm the correctness of the entered data and I know the  <a href=\"%s\" target=\"_blank\" title=\"Terms of Service\">Terms of Service</a> and accept them.";
-$_ARRAYLANG['TXT_ACCESS_TOS'] = "Terms of Service";
-$_ARRAYLANG['TXT_ACCESS_TOS_NOT_CHECKED'] = "You have to accept the Terms of Service to sign up!";
-$_ARRAYLANG['TXT_ACCESS_CAPTCHA'] = "Security Code";
-$_ARRAYLANG['TXT_ACCESS_NEWSLETTERS_SUBSCRIBE_COLON'] = "Folgende Newsletter abonnieren:";
-
-$_ARRAYLANG['TXT_ACCESS_PASSWORD_MINIMAL_CHARACTERS'] = "Das Passwort muss mindestens 6 Zeichen lang sein.";
-$_ARRAYLANG['TXT_ACCESS_PASSWORD_MINIMAL_CHARACTERS_WITH_COMPLEXITY'] = "Das Passwort muss mindestens 6 Zeichen lang sein und mindestens einen Gross-, einen Kleinbuchstaben und eine Zahl enthalten.";

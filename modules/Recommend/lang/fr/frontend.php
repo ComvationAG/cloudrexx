@@ -50,5 +50,4 @@ $_ARRAYLANG['TXT_PREVIEW_FRONTEND'] = "Aperçu";
 $_ARRAYLANG['TXT_FEMALE_FRONTEND'] = "Féminin";
 $_ARRAYLANG['TXT_MALE_FRONTEND'] = "Masculin";
 $_ARRAYLANG['TXT_INTRODUCTION'] = "Pour recommander cette page, remplir simplement le formulaire suivant et cliquer finalement sur \"envoyer\". Un E-mail sera envoyé au destinataire pour lui signaler cette page.";
-$_ARRAYLANG['TXT_RECOMMEND_CAPTCHA'] = "Code sécurité";
 ?>

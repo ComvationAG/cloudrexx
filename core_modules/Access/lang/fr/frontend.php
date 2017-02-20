@@ -105,7 +105,7 @@ $_ARRAYLANG['TXT_ACCESS_INVALID_CAPTCHA_CODE'] = "Le code d'entrée de sécurit�
 $_ARRAYLANG['TXT_ACCESS_ACCEPT_TOS'] = "Je confirme l'exactitude des indications faites et de connaître les<a href=\"%s\" target=\"_blank\" title=\"conditions générales\">conditions générales</a>et de les accepter.";
 $_ARRAYLANG['TXT_ACCESS_TOS'] = "Conditions générales";
 $_ARRAYLANG['TXT_ACCESS_TOS_NOT_CHECKED'] = "Vous devez accepter les conditions générales!";
-$_ARRAYLANG['TXT_ACCESS_CAPTCHA'] = "Code d'entrée de sécurité ";
+$_ARRAYLANG['TXT_ACCESS_CAPTCHA'] = "Code de sécurité";
 $_ARRAYLANG['TXT_ACCESS_NEWSLETTERS_SUBSCRIBE_COLON'] = "Abonner le bulletin d'information suivant:";
 
 $_ARRAYLANG['TXT_ACCESS_PASSWORD_MINIMAL_CHARACTERS'] = "Das Passwort muss mindestens 6 Zeichen lang sein.";

@@ -123,11 +123,28 @@ class CalendarForm extends CalendarLibrary
                              field.`required` AS `required`,
                              field.`order` AS `order`,
                              field.`affiliation` AS `affiliation`,
-                             name.`name` AS `name`,
-                             name.`default` AS `default`
-                        FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_registration_form_field AS field,
-                             ".DBPREFIX."module_".$this->moduleTablePrefix."_registration_form_field_name AS name
-                       WHERE (field.`id` = name.`field_id` AND name.`lang_id` = '".intval($_LANGID)."' AND field.`form` = '".intval($this->id)."' )
+                             (
+                                SELECT `fieldName`.`name`
+                                FROM `".DBPREFIX."module_".$this->moduleTablePrefix."_registration_form_field_name` AS `fieldName`
+                                WHERE `fieldName`.`field_id` = `field`.`id` AND `fieldName`.`form_id` = `field`.`form`
+                                ORDER BY CASE `fieldName`.`lang_id`
+                                            WHEN '.$_LANGID.' THEN 1
+                                            ELSE 2
+                                            END
+                                LIMIT 1
+                             ) AS `name`,
+                             (
+                                SELECT `fieldDefault`.`default`
+                                FROM `".DBPREFIX."module_".$this->moduleTablePrefix."_registration_form_field_name` AS `fieldDefault`
+                                WHERE `fieldDefault`.`field_id` = `field`.`id` AND `fieldDefault`.`form_id` = `field`.`form`
+                                ORDER BY CASE `fieldDefault`.`lang_id`
+                                            WHEN '.$_LANGID.' THEN 1
+                                            ELSE 2
+                                            END
+                                LIMIT 1
+                             ) AS `default`
+                        FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_registration_form_field AS field
+                       WHERE field.`form` = '".intval($this->id)."'
                     ORDER BY field.`order`";
 
             $objResultInputfield = $objDatabase->Execute($queryInputfield);

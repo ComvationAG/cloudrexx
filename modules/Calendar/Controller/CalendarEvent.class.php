@@ -72,6 +72,13 @@ class CalendarEvent extends CalendarLibrary
     public $title;
     
     /**
+     * Event teaser
+     *
+     * @var string 
+     */
+    public $teaser;
+    
+    /**
      * Event Picture
      * 
      * @access public
@@ -266,6 +273,13 @@ class CalendarEvent extends CalendarLibrary
      * @var boolean
      */
     public $confirmed;
+    
+    /**
+     * Whether or not to show the detail view of the event
+     * 
+     * @var boolean
+     */
+    public $showDetailView;
     
     /**
      * Event author
@@ -657,6 +671,7 @@ class CalendarEvent extends CalendarLibrary
                          event.status AS status,
                          event.author AS author,
                          event.confirmed AS confirmed,
+                         event.show_detail_view,
                          event.show_in AS show_in,
                          event.google AS google,
                          event.invited_groups AS invited_groups,
@@ -701,6 +716,7 @@ class CalendarEvent extends CalendarLibrary
                          event.org_link AS org_link, 
                          event.org_email AS org_email, 
                          field.title AS title,
+                         field.teaser AS teaser,
                          field.description AS description,
                          event.place AS place
                     FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_event AS event,
@@ -738,6 +754,7 @@ class CalendarEvent extends CalendarLibrary
                 $this->id = intval($eventId);   
                 $this->type = intval($objResult->fields['type']); 
                 $this->title = htmlentities(stripslashes($objResult->fields['title']), ENT_QUOTES, CONTREXX_CHARSET);            
+                $this->teaser = htmlentities(stripslashes($objResult->fields['teaser']), ENT_QUOTES, CONTREXX_CHARSET);            
                 $this->pic = htmlentities($objResult->fields['pic'], ENT_QUOTES, CONTREXX_CHARSET);
                 $this->attach = htmlentities($objResult->fields['attach'], ENT_QUOTES, CONTREXX_CHARSET);
                 $this->author = htmlentities($objResult->fields['author'], ENT_QUOTES, CONTREXX_CHARSET);
@@ -786,6 +803,7 @@ class CalendarEvent extends CalendarLibrary
                 $this->showIn = htmlentities($objResult->fields['show_in'], ENT_QUOTES, CONTREXX_CHARSET);
                 $this->availableLang = intval($langId);
                 $this->status = intval($objResult->fields['status']);
+                $this->showDetailView = intval($objResult->fields['show_detail_view']);
                 $this->catId = intval($objResult->fields['catid']);
                 $this->map = intval($objResult->fields['google']);
                 $this->seriesStatus = intval($objResult->fields['series_status']);   
@@ -903,6 +921,7 @@ class CalendarEvent extends CalendarLibrary
         
         foreach ($activeLangs as $key => $langId) {
             $query = "SELECT field.title AS title,
+                             field.teaser AS teaser,
                              field.description AS description,
                              field.redirect AS redirect                                 
                         FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_event_field AS field
@@ -915,6 +934,7 @@ class CalendarEvent extends CalendarLibrary
             if ($objResult !== false) {
                 while (!$objResult->EOF) {
                         $this->arrData['title'][$langId] = htmlentities(stripslashes($objResult->fields['title']), ENT_QUOTES, CONTREXX_CHARSET);                        
+                        $this->arrData['teaser'][$langId] = htmlentities(stripslashes($objResult->fields['teaser']), ENT_QUOTES, CONTREXX_CHARSET);                        
                         $this->arrData['description'][$langId] = stripslashes($objResult->fields['description']);
                         $this->arrData['redirect'][$langId] = htmlentities(stripslashes($objResult->fields['redirect']), ENT_QUOTES, CONTREXX_CHARSET);                         
                         $objResult->MoveNext();
@@ -966,6 +986,7 @@ class CalendarEvent extends CalendarLibrary
         $google        = isset($data['map'][$_LANGID]) ? intval($data['map'][$_LANGID]) : 0;
         $allDay        = isset($data['all_day']) ? 1 : 0;
         $convertBBCode = ($objInit->mode == 'frontend' && empty($id));
+        $showDetailView= isset($data['show-detail-view']) ? 1 : 0;
         
         $useCustomDateDisplay = isset($data['showDateSettings']) ? 1 : 0;
         $showStartDateList    = isset($data['showStartDateList']) ? $data['showStartDateList'] : 0;
@@ -1271,6 +1292,7 @@ class CalendarEvent extends CalendarLibrary
             'attach'                        => $attach,
             'place_mediadir_id'             => $placeMediadir,
             'host_mediadir_id'              => $hostMediadir,            
+            'show_detail_view'              => $showDetailView,
             'show_in'                       => $showIn,
             'invited_groups'                => $invited_groups,             
             'invited_mails'                 => $invited_mails,
@@ -1367,6 +1389,7 @@ class CalendarEvent extends CalendarLibrary
         if($id != 0) {
             foreach ($data['showIn'] as $key => $langId) {
                 $title = contrexx_addslashes(contrexx_strip_tags($data['title'][$langId]));
+                $teaser = contrexx_addslashes(contrexx_strip_tags($data['teaser'][$langId]));
                 $description = contrexx_addslashes($data['description'][$langId]);
                 if ($convertBBCode) {
                     $description = \Cx\Core\Wysiwyg\Wysiwyg::prepareBBCodeForDb($data['description'][$langId], true);
@@ -1380,9 +1403,9 @@ class CalendarEvent extends CalendarLibrary
                 }
 
                 $query = "INSERT INTO ".DBPREFIX."module_".$this->moduleTablePrefix."_event_field
-                            (`event_id`,`lang_id`,`title`, `description`,`redirect`)
+                            (`event_id`,`lang_id`,`title`, `teaser`, `description`,`redirect`)
                           VALUES
-                            ('".intval($id)."','".intval($langId)."','".$title."','".$description."','".$redirect."')";
+                            ('".intval($id)."','".intval($langId)."','".$title."','".$teaser."','".$description."','".$redirect."')";
 
                 $objResult = $objDatabase->Execute($query); 
 
@@ -1782,14 +1805,16 @@ class CalendarEvent extends CalendarLibrary
         $query = "SELECT event.`id` AS `id`,
                          event.`startdate`,
                          field.`title` AS `title`,
+                         field.`teaser` AS `teaser`,
                          field.`description` AS content,
                          event.`place` AS place,
-                         MATCH (field.`title`, field.`description`) AGAINST ('%$term%') AS `score`
+                         MATCH (field.`title`, field.`teaser`, field.`description`) AGAINST ('%$term%') AS `score`
                     FROM ".DBPREFIX."module_calendar_event AS event,
                          ".DBPREFIX."module_calendar_event_field AS field
                    WHERE   (event.id = field.event_id AND field.lang_id = '".intval($_LANGID)."')
                        AND event.status = 1
                        AND (   field.title LIKE ('%$term%')
+                            OR field.teaser LIKE ('%$term%')
                             OR field.description LIKE ('%$term%')
                             OR event.place LIKE ('%$term%')
                            )";

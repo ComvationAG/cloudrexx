@@ -553,6 +553,7 @@ class CalendarManager extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_MANAGE'                           => $_ARRAYLANG['TXT_CALENDAR_MANAGE'],
             'TXT_'.$this->moduleLangVar.'_EVENT_SHOW_IN'                    => $_ARRAYLANG['TXT_CALENDAR_EVENT_SHOW_IN'],
             'TXT_'.$this->moduleLangVar.'_EVENT_TITLE'                      => $_ARRAYLANG['TXT_CALENDAR_EVENT_TITLE'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_TEASER'                     => $_ARRAYLANG['TXT_CALENDAR_EVENT_TEASER'],
             'TXT_'.$this->moduleLangVar.'_EVENT_PLACE'                      => $_ARRAYLANG['TXT_CALENDAR_EVENT_PLACE'],
             'TXT_'.$this->moduleLangVar.'_EVENT_STREET'                     => $_ARRAYLANG['TXT_CALENDAR_EVENT_STREET'],
             'TXT_'.$this->moduleLangVar.'_EVENT_ZIP'                        => $_ARRAYLANG['TXT_CALENDAR_EVENT_ZIP'],
@@ -564,6 +565,8 @@ class CalendarManager extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_PLACE_DATA_FROM_MEDIADIR'         => $_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_FROM_MEDIADIR'],
             'TXT_'.$this->moduleLangVar.'_PREV'                             => $_ARRAYLANG['TXT_CALENDAR_PREV'],
             'TXT_'.$this->moduleLangVar.'_NEXT'                             => $_ARRAYLANG['TXT_CALENDAR_NEXT'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_DETAIL_VIEW'                => $_ARRAYLANG['TXT_CALENDAR_EVENT_DETAIL_VIEW'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_DETAIL_VIEW_LABEL'          => $_ARRAYLANG['TXT_CALENDAR_EVENT_DETAIL_VIEW_LABEL'],
             
             //show media browser button
             $this->moduleLangVar.'_EVENT_REDIRECT_BROWSE_BUTTON'            => self::showMediaBrowserButton('eventRedirect', 'sitestructure'),
@@ -579,6 +582,7 @@ class CalendarManager extends CalendarLibrary
             $this->moduleLangVar.'_EVENT_SERIES_PATTERN_MONTHLY_COUNT'      => $count,
             $this->moduleLangVar.'_EVENT_SERIES_PATTERN_MONTHLY_WEEKDAY'    => $weekdays,
             $this->moduleLangVar.'_EVENT_REGISTRATION_FORMS'                => $objFormManager->getFormDorpdown(intval($objEvent->registrationForm)),
+            $this->moduleLangVar.'_EVENT_SHOW_DETAIL_VIEW'                  => $eventId != 0 ? ($objEvent->showDetailView == 1 ? 'checked="checked"' : '') : 'checked="checked"',
             
             $this->moduleLangVar.'_EVENT_TYPE_EVENT'                        => $eventId != 0 ? ($objEvent->type == 0 ? 'selected="selected"' : '') : '',      
             $this->moduleLangVar.'_EVENT_TYPE_REDIRECT'                     => $eventId != 0 ? ($objEvent->type == 1 ? 'selected="selected"' : '') : '',
@@ -1002,7 +1006,8 @@ class CalendarManager extends CalendarLibrary
                         
             $this->_objTpl->setVariable(array(        	
                 $this->moduleLangVar.'_EVENT_TAB_DISPLAY'   => $arrLang['is_default'] == 'true' ? 'block' : 'none',
-                $this->moduleLangVar.'_EVENT_TITLE'         => !empty($objEvent->arrData['title'][$arrLang['id']]) ? $objEvent->arrData['title'][$arrLang['id']] : $objEvent->title,                
+                $this->moduleLangVar.'_EVENT_TITLE'         => !empty($objEvent->arrData['title'][$arrLang['id']]) ? $objEvent->arrData['title'][$arrLang['id']] : $objEvent->title,
+                $this->moduleLangVar.'_EVENT_TEASER'        => !empty($objEvent->arrData['teaser'][$arrLang['id']]) ? $objEvent->arrData['teaser'][$arrLang['id']] : $objEvent->teaser,
 	    ));
 	                  	    	        
 	    //parse eventTabMenuDescTab

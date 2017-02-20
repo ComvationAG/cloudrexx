@@ -837,10 +837,18 @@ class InitCMS
      * @param integer $languageId Id of the desired language i.e. 1 for german
      * @return array The language data which has been loaded
      */
-    public function getComponentSpecificLanguageData($componentName, $frontend = true, $languageId) {
+    public function getComponentSpecificLanguageData($componentName, $frontend = true, $languageId = 0) {
         global $_ARRAYLANG;
 
         $mode = $frontend ? 'frontend' : 'backend';
+        
+        if (!$languageId) {
+            if ($frontend) {
+                $languageId = $this->frontendLangId;
+            } else {
+                $languageId = $this->backendLangId;
+            }
+        }
 
         if ($componentName == 'Core') {
             $componentName = lcfirst($componentName);

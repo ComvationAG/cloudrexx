@@ -631,3 +631,6 @@ $_ARRAYLANG['TXT_CALENDAR_PREV'] = "Prev";
 $_ARRAYLANG['TXT_CALENDAR_NEXT'] = "Next";
 $_ARRAYLANG['TXT_CALENDAR_COPY'] = "Use as template for new event";
 $_ARRAYLANG['TXT_CALENDAR_DEFAULT'] = "Default";
+$_ARRAYLANG['TXT_CALENDAR_EVENT_DETAIL_VIEW'] = "Detail view";
+$_ARRAYLANG['TXT_CALENDAR_EVENT_DETAIL_VIEW_LABEL'] = "Show link to detail view of this event";
+$_ARRAYLANG['TXT_CALENDAR_EVENT_TEASER'] = "Teaser";

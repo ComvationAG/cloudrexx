@@ -1002,7 +1002,6 @@ $_ARRAYLANG['TXT_CALENDAR_ADD_ENTRIES'] = "Veranstaltungen hinzufügen";
 $_ARRAYLANG['TXT_CALENDAR_MANAGE_KATEGORIES'] = "Kategorien verwalten";
 $_ARRAYLANG['TXT_CALENDAR_SETTINGS'] = "Einstellungen";
 $_ARRAYLANG['TXT_CALENDAR_MANAGE_ENTRIES'] = "Einträge verwalten";
-$_ARRAYLANG['TXT_CAPTCHA'] = "Sicherheitscode";
 $_ARRAYLANG['TXT_ALIAS_DOMAIN_MAPPING'] = "Domain-Mappings";
 $_ARRAYLANG['TXT_ACCESS_GROUP_NAME_INVALID'] = "Der gewählte Gruppenname ist nicht gültig! Wählen Sie bitte einen anderen Namen für die Gruppe.";
 $_ARRAYLANG['TXT_ACCESS_USER_ACCOUNTS_ACTIVATED'] = "Benutzerkonten aktiviert";

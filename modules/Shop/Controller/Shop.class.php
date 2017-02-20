@@ -415,7 +415,7 @@ die("Failed to get Customer for ID $customer_id");
         if (!$use_cache) $content[$templateHash] = NULL;
         // Note: This is valid only as long as the content is the same every
         // time this method is called!
-        if ($content[$templateHash]) return $content[$templateHash];
+        if (isset($content[$templateHash])) return $content[$templateHash];
         $objTpl = new \Cx\Core\Html\Sigma('.');
         $objTpl->setErrorHandling(PEAR_ERROR_DIE);
         $objTpl->setTemplate(empty($template)

@@ -34,26 +34,20 @@
  * @copyright  CLOUDREXX CMS - CLOUDREXX AG
  * @version    1.00
  */
-$_ARRAYLANG['TXT_CALENDAR_BACK'] = "zurück zum Kalender";
 $_ARRAYLANG['TXT_NEXT_CALENDAR_EVENTS'] = "De næste terminer:";
 $_ARRAYLANG['TXT_CALENDAR_SHOW'] = "vis";
 $_ARRAYLANG['TXT_CALENDAR_EVENTS_NO'] = "Der blev ikke fundet nogle terminer...";
 $_ARRAYLANG['TXT_CALENDAR_EVENTS'] = "Terminer";
-$_ARRAYLANG['TXT_CALENDAR_ALL_CAT'] = "Alle Kategorien";
-$_ARRAYLANG['TXT_CALENDAR_CAT'] = "Kategorie";
 $_ARRAYLANG['TXT_CALENDAR_NAME'] = "Emne";
 $_ARRAYLANG['TXT_CALENDAR_PLACE'] = "Sted";
 $_ARRAYLANG['TXT_CALENDAR_PRIORITY'] = "Prioritet";
-$_ARRAYLANG['TXT_CALENDAR_START'] = "Start";
 $_ARRAYLANG['TXT_CALENDAR_END'] = "Slut";
 $_ARRAYLANG['TXT_CALENDAR_COMMENT'] = "Beskrivelse";
-$_ARRAYLANG['TXT_CALENDAR_INFO'] = "Link";
 $_ARRAYLANG['TXT_CALENDAR_SEARCH'] = "Søg";
 $_ARRAYLANG['TXT_ENDDATE'] = "Til:";
 $_ARRAYLANG['TXT_DETAILED'] = "Detaljer";
 $_ARRAYLANG['TXT_CALENDAR_STARTDATE'] = "Startdato";
 $_ARRAYLANG['TXT_CALENDAR_ENDDATE'] = "Slutdato";
-$_ARRAYLANG['TXT_CALENDAR_TITLE'] = "Titel";
 $_ARRAYLANG['TXT_CALENDAR_KEYWORD'] = "Søgeord";
 $_ARRAYLANG['TXT_CALENDAR_TILL'] = "Til";
 $_ARRAYLANG['TXT_CALENDAR_FROM'] = "Fra";
@@ -65,7 +59,6 @@ $_ARRAYLANG['TXT_CALENDAR_EXPORT_ICAL_EVENT'] = "Eksporter dette arrangement";
 $_ARRAYLANG['TXT_CALENDAR_TERMIN'] = "Aktivitet";
 $_ARRAYLANG['TXT_CALENDAR_STREET_NR'] = "Vej / nr.";
 $_ARRAYLANG['TXT_CALENDAR_ZIP'] = "Postnr.";
-$_ARRAYLANG['TXT_CALENDAR_LINK'] = "Link";
 $_ARRAYLANG['TXT_CALENDAR_PRICE'] = "Pris";
 $_ARRAYLANG['TXT_CALENDAR_MAP'] = "Kort";
 $_ARRAYLANG['TXT_CALENDAR_MAIL'] = "E-mail";
@@ -117,20 +110,4 @@ $_ARRAYLANG['TXT_CALENDAR_REGISTRATIONS_ACTIVATED'] = "Aktiver tilmeldelse";
 $_ARRAYLANG['TXT_CALENDAR_REGISTRATIONS_SUBSCRIBER'] = "Antal deltagere";
 $_ARRAYLANG['TXT_CALENDAR_NOTIFICATION_ACTIVATE'] = "Aktiver underretning";
 $_ARRAYLANG['TXT_CALENDAR_REG_NO_ESCORT'] = "Ingen eskort";
-$_ARRAYLANG['TXT_CALENDAR_FRONTENDSAVEOK'] = "Ihr Eintrag wurde gespeichert.";
-$_ARRAYLANG['TXT_CALENDAR_ACTION_NOT_ACTIVATED'] = "Sorry, This functionality is not activated.";
-$_ARRAYLANG['TXT_CALENDAR_WRONG_FILETYPE'] = "Ungültige Dateiendung.";
-$_ARRAYLANG['TXT_CALENDAR_UPLOAD_ERROR_PIC'] = "Bild Upload";
-$_ARRAYLANG['TXT_CALENDAR_UPLOAD_ERROR_ATTACHMENT'] = "Anhang Upload";
-$_ARRAYLANG['TXT_CALENDAR_REGISTRATION_SUBMIT'] = "Absenden";
-$_ARRAYLANG['TXT_CALENDAR_INVALID_CAPTCHA_CODE'] = "Bitte geben sie den Captcha Code erneut ein.";
-$_ARRAYLANG['TXT_CALENDAR_TYPE'] = "Typ";
-$_ARRAYLANG['TXT_CALENDAR_EXPORT'] = "Exportieren";
-$_ARRAYLANG['TXT_CALENDAR_PLEASE_CHOOSE'] = "Bitte wählen";
-$_ARRAYLANG['TXT_CALENDAR_EVENT_FULLY_BLOCKED'] = "Die Veranstaltung ist leider ausgebucht. Es können keine weiteren Anmeldungen entgegen genommen werden.";
-$_ARRAYLANG['TXT_CALENDAR_REGISTRATION_SUCCESSFULLY_ADDED'] = "Ihre Anmeldung wurde erfolgreich in unserem System gespeichert.";
-$_ARRAYLANG['TXT_CALENDAR_OCLOCK'] = "Uhr";
-$_ARRAYLANG['TXT_CALENDAR_EVENT_SUCCESSFULLY_SAVED'] = "Event successfull saved";
-$_ARRAYLANG['TXT_CALENDAR_EVENT_CORRUPT_SAVED'] = "Corrupt save";
-$_ARRAYLANG['TXT_CALENDAR_ACTIVE'] = "aktiv";
 ?>

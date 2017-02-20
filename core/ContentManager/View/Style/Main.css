@@ -1306,14 +1306,13 @@ div.date img{
     margin: 0 5px 0 0;
 }
 
-#page #page_target_text_wrapper {
-    display: none;
+#page .page_target_text_wrapper {
     float: left;
     margin: 0 10px 0 0;
 }
 
 #page #page_target_wrapper .icon,
-#page #page_target_text_wrapper .icon {
+#page .page_target_text_wrapper .icon {
     float: left;
     width: 16px;
     height: 16px;
@@ -1324,7 +1323,7 @@ div.date img{
     display: none;
 }
 
-#page #page_target_text {
+#page .page_target_text {
     float: left;
     padding: 3px 0 0 0;
     margin: 0 5px 0 0;

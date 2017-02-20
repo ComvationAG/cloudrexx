@@ -939,7 +939,6 @@ $_ARRAYLANG['TXT_CALENDAR_SETTINGS'] = "Einstellungen";
 $_ARRAYLANG['TXT_CALENDAR_ADMINEVENTS'] = "Veranstaltungen verwalten";
 $_ARRAYLANG['TXT_CALENDAR_ADMINCATEGORIES'] = "Kategorien verwalten";
 $_ARRAYLANG['TXT_CALENDAR_ADMINREGISTRATIONS'] = "Anmeldungen verwalten";
-$_ARRAYLANG['TXT_CAPTCHA'] = "Sicherheitscode";
 $_ARRAYLANG['TXT_CORE_CAPTCHA'] = "Security code";
 $_ARRAYLANG['TXT_CORE_CAPTCHA_ENTER_THE_LETTERS_BELOW'] = "Enter the letters below.";
 $_ARRAYLANG['TXT_CORE_REMEMBER_ME'] = "Remember me";

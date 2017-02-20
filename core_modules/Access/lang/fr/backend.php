@@ -283,7 +283,7 @@ $_ARRAYLANG['TXT_ACCESS_BROWSE'] = "Rechercher ";
 $_ARRAYLANG['TXT_ACCESS_HOMEPAGE_DESC'] = "Choisissez la page sur laquelle les utilisateurs de ce groupe doivent atterrir après que les utilisateurs se sont authentifiés avec succès.";
 $_ARRAYLANG['TXT_ACCESS_TOS_SINGUP_DESC'] = "Les utilisateurs doivent accepter lors de l'engistrement <a href=\"%s\" target=\"_blank\" title=\"ToS\">ToS</a> ";
 $_ARRAYLANG['TXT_ACCESS_TOS'] = "Conditions générales";
-$_ARRAYLANG['TXT_ACCESS_CAPTCHA'] = "Code d'entrée de sécurité ";
+$_ARRAYLANG['TXT_ACCESS_CAPTCHA'] = "Code de sécurité";
 $_ARRAYLANG['TXT_ACCESS_CAPTCHA_SIGNUP_DESC'] = "Les utilisateurs doivent copier lors de l'engistrement un code de sécurité.Cela empêche que le robot peut s'inscrire.  This will prevent robots to sign up automatically.";
 $_ARRAYLANG['TXT_ACCESS_CROP_THUMBNAIL_TXT'] = "Couper à la taille des vignettes ";
 $_ARRAYLANG['TXT_ACCESS_SCALE_THUMBNAIL_TXT'] = "Mettre à l'échelle de la taille des vignettes  ";

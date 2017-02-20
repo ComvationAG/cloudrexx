@@ -55,5 +55,4 @@ $_ARRAYLANG['TXT_ADDITIONAL_STREET'] = "Улица";
 $_ARRAYLANG['TXT_ADDITIONAL_ZIP'] = "Индекс";
 $_ARRAYLANG['TXT_ADDITIONAL'] = "Дополнительные поля ввода для пользователей";
 $_ARRAYLANG['TXT_ADDITIONAL_CITY'] = "Место";
-$_ARRAYLANG['TXT_ADDITIONAL_COMMENT'] = "Kommentar";
 ?>

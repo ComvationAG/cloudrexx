@@ -171,8 +171,8 @@ class LoginManager {
         $confirmedPassword = isset($_POST['password2']) ? trim(contrexx_stripslashes($_POST['password2'])) : '';
 
         $this->objTemplate->setVariable(array(
-            'LOGIN_USERNAME'    => htmlentities($email, ENT_QUOTES, CONTREXX_CHARSET),
-            'LOGIN_RESTORE_KEY' => htmlentities($restoreKey, ENT_QUOTES, CONTREXX_CHARSET),
+            'LOGIN_EMAIL'       => contrexx_raw2xhtml($email),
+            'LOGIN_RESTORE_KEY' => contrexx_raw2xhtml($restoreKey),
         ));
 
         if (isset($_POST['reset_password'])) {

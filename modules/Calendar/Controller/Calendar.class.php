@@ -149,6 +149,14 @@ class Calendar extends CalendarLibrary
      * @var integer
      */
     public $boxCount = 3;
+
+    /**
+     * When using the ID of a category, we will
+     * simulate as if cmd=category has been requested
+     *
+     * @var boolean
+     */
+    protected $simulateCategoryView = false;
     
     /**
      * Constructor
@@ -182,7 +190,12 @@ class Calendar extends CalendarLibrary
             $objEvent->export();
         }
 
-        switch ($_REQUEST['cmd']) {
+        $cmd = isset($_REQUEST['cmd']) ? $_REQUEST['cmd'] : null;
+        if ($this->simulateCategoryView) {
+            $cmd = 'category';
+        }
+
+        switch ($cmd) {
             case 'detail':
                 if( $id!= null && $_GET['date'] != null) {
                     self::showEvent();
@@ -313,12 +326,16 @@ class Calendar extends CalendarLibrary
             $this->endDate->setTime(23, 59, 59);
         }
         
+        // In case $_GET['cmd'] is an integer, then we shall treat it as the
+        // ID of a category and switch to category-mode
+        if (!empty($cmd) && (string)intval($cmd) == $cmd) {
+            $catid = intval($cmd);
+            $cmd == 'category';
+            $this->simulateCategoryView = true;
+        }
         
         $this->searchTerm = !empty($term) ? contrexx_raw2db($term) : null;
         $this->categoryId = !empty($catid) ? intval($catid) : null;
-
-
-
 
         if ($cmd == 'boxes' || $cmd == 'category') {
             $this->startPos = 0;
@@ -961,6 +978,18 @@ UPLOADER;
         global $_ARRAYLANG, $_CORELANG;
 
         $this->_objTpl->setTemplate($this->pageContent, true, true);
+
+        // load source code if cmd value is integer
+        if ($this->_objTpl->placeholderExists('APPLICATION_DATA')) {
+            $page = new \Cx\Core\ContentManager\Model\Entity\Page();
+            $page->setVirtual(true);
+            $page->setType(\Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION);
+            $page->setModule('Calendar');
+            // load source code
+            $applicationTemplate = \Cx\Core\Core\Controller\Cx::getContentTemplateOfPage($page);
+            \LinkGenerator::parseTemplate($applicationTemplate);
+            $this->_objTpl->addBlock('APPLICATION_DATA', 'application_data', $applicationTemplate);
+        }
 
         $objCategoryManager = new \Cx\Modules\Calendar\Controller\CalendarCategoryManager(true);
         $objCategoryManager->getCategoryList();

@@ -34,12 +34,10 @@
  * @copyright  CLOUDREXX CMS - CLOUDREXX AG
  * @version    1.00
  */
-$_ARRAYLANG['TXT_CALENDAR_BACK'] = "zurück zum Kalender";
 $_ARRAYLANG['TXT_NEXT_CALENDAR_EVENTS'] = "Los pr&oacute;ximos eventos:";
 $_ARRAYLANG['TXT_CALENDAR_SHOW'] = "mostrar";
 $_ARRAYLANG['TXT_CALENDAR_EVENTS_NO'] = "No hay eventos..";
 $_ARRAYLANG['TXT_CALENDAR_EVENTS'] = "Eventos";
-$_ARRAYLANG['TXT_CALENDAR_ALL_CAT'] = "Alle Kategorien";
 $_ARRAYLANG['TXT_CALENDAR_CAT'] = "Categor&iacute;a";
 $_ARRAYLANG['TXT_CALENDAR_NAME'] = "Asunto";
 $_ARRAYLANG['TXT_CALENDAR_PLACE'] = "Lugar";
@@ -118,19 +116,5 @@ $_ARRAYLANG['TXT_CALENDAR_REGISTRATIONS_SUBSCRIBER'] = "N&uacute;mero de persona
 $_ARRAYLANG['TXT_CALENDAR_NOTIFICATION_ACTIVATE'] = "Activar la notificaci&oacute;n";
 $_ARRAYLANG['TXT_CALENDAR_REG_NO_ESCORT'] = "Sin escolta";
 $_ARRAYLANG['TXT_CALENDAR_FRONTENDSAVEOK'] = "Entrada guardada con &eacute;xito";
-$_ARRAYLANG['TXT_CALENDAR_ACTION_NOT_ACTIVATED'] = "Sorry, This functionality is not activated.";
-$_ARRAYLANG['TXT_CALENDAR_WRONG_FILETYPE'] = "Ungültige Dateiendung.";
-$_ARRAYLANG['TXT_CALENDAR_UPLOAD_ERROR_PIC'] = "Bild Upload";
-$_ARRAYLANG['TXT_CALENDAR_UPLOAD_ERROR_ATTACHMENT'] = "Anhang Upload";
-$_ARRAYLANG['TXT_CALENDAR_REGISTRATION_SUBMIT'] = "Absenden";
-$_ARRAYLANG['TXT_CALENDAR_INVALID_CAPTCHA_CODE'] = "Bitte geben sie den Captcha Code erneut ein.";
-$_ARRAYLANG['TXT_CALENDAR_TYPE'] = "Typ";
-$_ARRAYLANG['TXT_CALENDAR_EXPORT'] = "Exportieren";
-$_ARRAYLANG['TXT_CALENDAR_PLEASE_CHOOSE'] = "Bitte wählen";
-$_ARRAYLANG['TXT_CALENDAR_EVENT_FULLY_BLOCKED'] = "Die Veranstaltung ist leider ausgebucht. Es können keine weiteren Anmeldungen entgegen genommen werden.";
-$_ARRAYLANG['TXT_CALENDAR_REGISTRATION_SUCCESSFULLY_ADDED'] = "Ihre Anmeldung wurde erfolgreich in unserem System gespeichert.";
-$_ARRAYLANG['TXT_CALENDAR_OCLOCK'] = "Uhr";
-$_ARRAYLANG['TXT_CALENDAR_EVENT_SUCCESSFULLY_SAVED'] = "Event successfull saved";
-$_ARRAYLANG['TXT_CALENDAR_EVENT_CORRUPT_SAVED'] = "Corrupt save";
 $_ARRAYLANG['TXT_CALENDAR_ACTIVE'] = "Activo";
 ?>

@@ -44,11 +44,44 @@ namespace Cx\Core\LanguageManager\Controller;
  * @package     cloudrexx
  * @subpackage  core_languagemanager
  */
-class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
+class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController implements \Cx\Core\Event\Model\Entity\EventListener {
+    
     public function getControllerClasses() {
         // Return an empty array here to let the component handler know that there
         // does not exist a backend, nor a frontend controller of this component.
         return array();
+    }
+    
+    public function registerEventListeners() {
+        $this->cx->getEvents()->addEventListener('preComponent', $this);
+    }
+    
+    /**
+     * Event handler to load component language
+     * @param string $eventName Name of triggered event, should always be static::EVENT_NAME
+     * @param array $eventArgs Supplied arguments, should be an array (see DBG message below)
+     */
+    public function onEvent($eventName, array $eventArgs) {
+        global $_ARRAYLANG;
+        
+        // we might be in a hook where lang is not yet initialized (before resolve)
+        if (!count($_ARRAYLANG)) {
+            return;
+        }
+        
+        $frontend = $this->cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
+        $objInit = \Env::get('init');
+        switch ($eventName) {
+            case 'preComponent':
+                $_ARRAYLANG = array_merge(
+                    $_ARRAYLANG,
+                    $objInit->getComponentSpecificLanguageData(
+                        $eventArgs['componentName'],
+                        $frontend
+                    )
+                );
+                break;
+        }
     }
 
      /**
