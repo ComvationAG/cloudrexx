@@ -1642,6 +1642,12 @@ EOF;
             }
         }
 
+        // Clear cache
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getEvents()->triggerEvent(
+            'clearEsiCache',
+            array('Widget', $this->getGlobalPlaceholderNames())
+        );
         parent::getSettings();
         parent::getCommunityGroups();
 

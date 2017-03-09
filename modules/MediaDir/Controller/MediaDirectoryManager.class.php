@@ -879,12 +879,16 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
         $intId = intval($_GET['id']);
         $intState = intval($_GET['state']);
 
-        switch ($_GET['type']){
+        $clearCache = false;
+        $type = isset($_GET['type']) ? contrexx_input2raw($_GET['type']) : '';
+        switch ($type){
             case 'category':
                 $query = "UPDATE ".DBPREFIX."module_".$this->moduleTablePrefix."_categories SET active = '".$intState."' WHERE id = ".$intId;
+                $clearCache = true;
                 break;
             case 'level':
                 $query = "UPDATE ".DBPREFIX."module_".$this->moduleTablePrefix."_levels SET active = '".$intState."' WHERE id = ".$intId;
+                $clearCache = true;
                 break;
             case 'mail_template':
                 $query = "UPDATE ".DBPREFIX."module_".$this->moduleTablePrefix."_mails SET active = '".$intState."' WHERE id = ".$intId;
@@ -897,10 +901,22 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                 break;
             case 'entry':
                 $query = "UPDATE ".DBPREFIX."module_".$this->moduleTablePrefix."_entries SET active = '".$intState."' WHERE id = ".$intId;
+                $clearCache = true;
                 break;
         }
 
-        $objDatabase->Execute($query);
+        if ($objDatabase->Execute($query) && $clearCache) {
+            // Clear cache
+            $widgets = array('MEDIADIR_NAVBAR', 'MEDIADIR_LATEST','mediadirLatest');
+            if ($type == 'entry') {
+                $widgets = $this->getGlobalPlaceholderNames();
+            }
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cx->getEvents()->triggerEvent(
+                'clearEsiCache',
+                array('Widget', $widgets)
+            );
+        }
 
         die();
     }
@@ -1601,4 +1617,3 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
         $this->_objTpl->parse('settings_content');
     }
 }
-?>

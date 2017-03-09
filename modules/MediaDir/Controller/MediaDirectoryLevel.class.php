@@ -610,6 +610,12 @@ class MediaDirectoryLevel extends MediaDirectoryLibrary
                 }
 
                 if($objInsertNames !== false) {
+                    // Clear cache
+                    $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                    $cx->getEvents()->triggerEvent(
+                        'clearEsiCache',
+                        array('Widget', array('MEDIADIR_NAVBAR', 'MEDIADIR_LATEST','mediadirLatest'))
+                    );
                     return true;
                 } else {
                     return false;
@@ -665,6 +671,12 @@ class MediaDirectoryLevel extends MediaDirectoryLibrary
                 }
 
                 if($objInsertNames !== false) {
+                    // Clear cache
+                    $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                    $cx->getEvents()->triggerEvent(
+                        'clearEsiCache',
+                        array('Widget', array('MEDIADIR_NAVBAR', 'MEDIADIR_LATEST','mediadirLatest'))
+                    );
                     return true;
                 } else {
                     return false;
@@ -697,6 +709,12 @@ class MediaDirectoryLevel extends MediaDirectoryLibrary
         $objDeleteLevelRS = $objDatabase->Execute("DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_levels WHERE level_id='$intLevelId'");
 
         if ($objDeleteLevelRS !== false) {
+            // Clear cache
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cx->getEvents()->triggerEvent(
+                'clearEsiCache',
+                array('Widget', array('MEDIADIR_NAVBAR', 'MEDIADIR_LATEST','mediadirLatest'))
+            );
             return true;
         } else {
             return false;
@@ -714,7 +732,12 @@ class MediaDirectoryLevel extends MediaDirectoryLibrary
             }
         }
 
+        // Clear cache
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getEvents()->triggerEvent(
+            'clearEsiCache',
+            array('Widget', array('MEDIADIR_NAVBAR', 'MEDIADIR_LATEST','mediadirLatest'))
+        );
         return true;
     }
 }
-?>

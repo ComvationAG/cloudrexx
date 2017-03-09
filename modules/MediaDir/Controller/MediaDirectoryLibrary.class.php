@@ -985,4 +985,21 @@ EOF;
 
         self::$currentFetchedEntryDataObject->listEntries($template, 4, $placeholder);
     }
+
+    /**
+     * Set global placeholder names
+     *
+     * @return array
+     */
+    public function getGlobalPlaceholderNames()
+    {
+        $placeholders = array('MEDIADIR_NAVBAR', 'MEDIADIR_LATEST', 'mediadirLatest');
+        for ($i = 1; $i <= 10; $i++) {
+            for ($j = 1; $j <= $i; $j++) {
+                $placeholders[] = 'mediadirLatest_row_' . $j . '_' . $i;
+            }
+        }
+
+        return $placeholders;
+    }
 }

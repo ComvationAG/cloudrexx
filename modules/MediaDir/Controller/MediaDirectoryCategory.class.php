@@ -598,6 +598,12 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
                 }
 
                 if($objInsertNames !== false) {
+                    // Clear cache
+                    $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                    $cx->getEvents()->triggerEvent(
+                        'clearEsiCache',
+                        array('Widget', array('MEDIADIR_NAVBAR', 'MEDIADIR_LATEST','mediadirLatest'))
+                    );
                     return true;
                 } else {
                     return false;
@@ -650,7 +656,13 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
                         ");
                     }
 
-                    if($objInsertNames !== false) {
+                    if ($objInsertNames !== false) {
+                        // Clear cache
+                        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                        $cx->getEvents()->triggerEvent(
+                            'clearEsiCache',
+                            array('Widget', array('MEDIADIR_NAVBAR', 'MEDIADIR_LATEST','mediadirLatest'))
+                        );
                         return true;
                     } else {
                         return false;
@@ -687,6 +699,12 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
         $objDeleteCategoryRS = $objDatabase->Execute("DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_categories WHERE category_id='$intCategoryId'");
 
         if ($objDeleteCategoryRS !== false) {
+            // Clear cache
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cx->getEvents()->triggerEvent(
+                'clearEsiCache',
+                array('Widget', array('MEDIADIR_NAVBAR', 'MEDIADIR_LATEST','mediadirLatest'))
+            );
             return true;
         } else {
             return false;
@@ -758,6 +776,12 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
                 return false;
             }
         }
+        // Clear cache
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getEvents()->triggerEvent(
+            'clearEsiCache',
+            array('Widget', array('MEDIADIR_NAVBAR', 'MEDIADIR_LATEST','mediadirLatest'))
+        );
 
         return true;
     }
@@ -782,4 +806,3 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
         return $childrenString;
     }
 }
-?>

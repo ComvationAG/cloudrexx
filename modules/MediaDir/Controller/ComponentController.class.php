@@ -46,13 +46,33 @@ use Cx\Modules\MediaDir\Model\Event\MediaDirEventListener;
  * @subpackage  module_mediadir
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
-    public function getControllerClasses() {
-        // Return an empty array here to let the component handler know that there
-        // does not exist a backend, nor a frontend controller of this component.
-        return array();
+    /**
+     * Returns all Controller class names for this component (except this)
+     *
+     * Be sure to return all your controller classes if you add your own
+     * @return array List of Controller class names (without namespace)
+     */
+    public function getControllerClasses()
+    {
+        return array('EsiWidget');
     }
 
-     /**
+    /**
+     * Returns a list of JsonAdapter class names
+     *
+     * The array values might be a class name without namespace. In that case
+     * the namespace \Cx\{component_type}\{component_name}\Controller is used.
+     * If the array value starts with a backslash, no namespace is added.
+     *
+     * Avoid calculation of anything, just return an array!
+     * @return array List of ComponentController classes
+     */
+    public function getControllersAccessableByJson()
+    {
+        return array('EsiWidgetController');
+    }
+
+    /**
      * Load your component.
      *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
@@ -97,93 +117,6 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 break;
         }
     }
-    /**
-     * Do something before content is loaded from DB
-     *
-     * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
-     */
-    public function preContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
-        global $objMadiadirPlaceholders, $page_template, $themesPages;
-        switch ($this->cx->getMode()) {
-            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
-                $objMadiadirPlaceholders = new MediaDirectoryPlaceholders($this->getName());
-                // Level/Category Navbar
-                if (preg_match('/{MEDIADIR_NAVBAR}/', \Env::get('cx')->getPage()->getContent())) {
-                    \Env::get('cx')->getPage()->setContent(str_replace('{MEDIADIR_NAVBAR}', $objMadiadirPlaceholders->getNavigationPlacholder(), \Env::get('cx')->getPage()->getContent()));
-                }
-                if (preg_match('/{MEDIADIR_NAVBAR}/', $page_template)) {
-                    $page_template = str_replace('{MEDIADIR_NAVBAR}', $objMadiadirPlaceholders->getNavigationPlacholder(), $page_template);
-                }
-                if (preg_match('/{MEDIADIR_NAVBAR}/', $themesPages['index'])) {
-                    $themesPages['index'] = str_replace('{MEDIADIR_NAVBAR}', $objMadiadirPlaceholders->getNavigationPlacholder(), $themesPages['index']);
-                }
-                if (preg_match('/{MEDIADIR_NAVBAR}/', $themesPages['sidebar'])) {
-                    $themesPages['sidebar'] = str_replace('{MEDIADIR_NAVBAR}', $objMadiadirPlaceholders->getNavigationPlacholder(), $themesPages['sidebar']);
-                }
-                // Latest Entries
-                if (preg_match('/{MEDIADIR_LATEST}/', \Env::get('cx')->getPage()->getContent())) {
-                    \Env::get('cx')->getPage()->setContent(str_replace('{MEDIADIR_LATEST}', $objMadiadirPlaceholders->getLatestPlacholder(), \Env::get('cx')->getPage()->getContent()));
-                }
-                if (preg_match('/{MEDIADIR_LATEST}/', $page_template)) {
-                    $page_template = str_replace('{MEDIADIR_LATEST}', $objMadiadirPlaceholders->getLatestPlacholder(), $page_template);
-                }
-                if (preg_match('/{MEDIADIR_LATEST}/', $themesPages['index'])) {
-                    $themesPages['index'] = str_replace('{MEDIADIR_LATEST}', $objMadiadirPlaceholders->getLatestPlacholder(), $themesPages['index']);
-                }
-                if (preg_match('/{MEDIADIR_LATEST}/', $themesPages['sidebar'])) {
-                    $themesPages['sidebar'] = str_replace('{MEDIADIR_LATEST}', $objMadiadirPlaceholders->getLatestPlacholder(), $themesPages['sidebar']);
-                }
-
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    /**
-     * Do something after content is loaded from DB
-     *
-     * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
-     */
-    public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
-        global $mediadirCheck, $objTemplate, $_CORELANG, $objInit;
-        switch ($this->cx->getMode()) {
-            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
-                $mediadirCheck = array();
-                for ($i = 1; $i <= 10; ++$i) {
-                    if ($objTemplate->blockExists('mediadirLatest_row_'.$i)){
-                        array_push($mediadirCheck, $i);
-                    }
-                }
-                if ($mediadirCheck || $objTemplate->blockExists('mediadirLatest')) {
-                    $objInit->loadLanguageData('MediaDir');
-
-                    $objMediadir = new MediaDirectory('', $this->getName());
-                    $objTemplate->setVariable('TXT_MEDIADIR_LATEST', $_CORELANG['TXT_DIRECTORY_LATEST']);
-                }
-                if ($mediadirCheck) {
-                    $objMediadir->getHeadlines($mediadirCheck);
-                }
-                if ($objTemplate->blockExists('mediadirLatest')){
-                    $objMediadirForms = new \Cx\Modules\MediaDir\Controller\MediaDirectoryForm(null, 'MediaDir');
-                    $foundOne = false;
-                    foreach ($objMediadirForms->getForms() as $key => $arrForm) {
-                        if ($objTemplate->blockExists('mediadirLatest_form_'.$arrForm['formCmd'])) {
-                            $objMediadir->getLatestEntries($key, 'mediadirLatest_form_'.$arrForm['formCmd']);
-                            $foundOne = true;
-                        }
-                    }
-                    //for the backward compatibility
-                    if(!$foundOne) {
-                        $objMediadir->getLatestEntries();
-                    }
-                }
-                break;
-            default:
-                break;
-        }
-    }
 
     /**
      * Register your event listeners here
@@ -199,5 +132,64 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $eventListener = new MediaDirEventListener($this->cx);
         $this->cx->getEvents()->addEventListener('SearchFindContent',$eventListener);
         $this->cx->getEvents()->addEventListener('mediasource.load', $eventListener);
+    }
+
+    /**
+     * Do something after system initialization
+     *
+     * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
+     * CALCULATE YOUR STUFF AS LATE AS POSSIBLE.
+     * This event must be registered in the postInit-Hook definition
+     * file config/postInitHooks.yml.
+     *
+     * @param \Cx\Core\Core\Controller\Cx $cx The instance of \Cx\Core\Core\Controller\Cx
+     */
+    public function postInit(\Cx\Core\Core\Controller\Cx $cx)
+    {
+        $widgetController = $this->getComponent('Widget');
+
+        //Show Level/Category Navbar and Latest Entries
+        $params = array();
+        if (isset($_GET['lid'])) {
+            $params['lid'] = contrexx_input2raw($_GET['lid']);
+        }
+        if (isset($_GET['cid'])) {
+            $params['cid'] = contrexx_input2raw($_GET['cid']);
+        }
+        foreach (array('MEDIADIR_NAVBAR', 'MEDIADIR_LATEST') as $widgetName) {
+            $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+                $this,
+                $widgetName,
+                false,
+                '',
+                '',
+                ($widgetName == 'MEDIADIR_NAVBAR' ? $params : array())
+            );
+            $widget->setEsiVariable(
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_THEME |
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_CHANNEL
+            );
+            $widgetController->registerWidget($widget);
+        }
+
+        //Show Latest MediaDir entries
+        for ($i = 1; $i <= 10; $i++) {
+            for ($j = 1; $j <= $i; $j++) {
+                $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+                    $this,
+                    'mediadirLatest_row_' . $j . '_' . $i,
+                    true
+                );
+                $widgetController->registerWidget($widget);
+            }
+        }
+
+        //Show the Latest MediaDir entries based on the MediaDir Form
+        $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+            $this,
+            'mediadirLatest',
+            true
+        );
+        $widgetController->registerWidget($widget);
     }
 }

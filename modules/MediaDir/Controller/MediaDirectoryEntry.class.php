@@ -889,6 +889,12 @@ JSCODE;
                 }
                 $objEntries->MoveNext();
             }
+            // Clear cache
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cx->getEvents()->triggerEvent(
+                'clearEsiCache',
+                array('Widget', $this->getGlobalPlaceholderNames())
+            );
         }
     }
 
@@ -1033,6 +1039,12 @@ JSCODE;
             $objDeleteCategories = $objDatabase->Execute("DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_categories WHERE entry_id='".$intId."'");
             $objDeleteLevels = $objDatabase->Execute("DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_levels WHERE entry_id='".$intId."'");
         }
+        // Clear cache
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getEvents()->triggerEvent(
+            'clearEsiCache',
+            array('Widget', $this->getGlobalPlaceholderNames())
+        );
 
 
         //////////////////////
@@ -1272,6 +1284,12 @@ JSCODE;
             return false;
         }
 
+        // Clear cache
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getEvents()->triggerEvent(
+            'clearEsiCache',
+            array('Widget', $this->getGlobalPlaceholderNames())
+        );
         return true;
     }
 
@@ -1292,7 +1310,13 @@ JSCODE;
                 `id`='".intval($intEntryId)."'
         ");
 
-        if($objConfirmEntry !== false) {
+        if ($objConfirmEntry !== false) {
+            // Clear cache
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cx->getEvents()->triggerEvent(
+                'clearEsiCache',
+                array('Widget', $this->getGlobalPlaceholderNames())
+            );
             $objMail = new MediaDirectoryMail(3, $intEntryId, $this->moduleName);
             return true;
         } else {
@@ -1331,16 +1355,23 @@ JSCODE;
 
             $intHits++;
 
-            $objResult = $objDatabase->Execute("UPDATE
-                                                    ".DBPREFIX."module_".$this->moduleTablePrefix."_entries
-                                                SET
-                                                    hits='".$intHits."',
-                                                    popular_hits='".$intPopularHits."',
-                                                    popular_date='".$strNewPopularDate."',
-                                                    last_ip='".$strNewIp."'
-                                                WHERE
-                                                    id='".intval($intEntryId)."'
-                                               ");
+            $objResult = $objDatabase->Execute(
+                'UPDATE `' . DBPREFIX . 'module_' . $this->moduleTablePrefix . '_entries`
+                    SET
+                        `hits`         = "' . $intHits . '",
+                        `popular_hits` = "' . $intPopularHits . '",
+                        `popular_date` = "' . $strNewPopularDate . '",
+                        `last_ip`      = "' . $strNewIp . '"
+                    WHERE `id` = "' . intval($intEntryId) . '"'
+            );
+            if ($objResult) {
+                // Clear cache
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $cx->getEvents()->triggerEvent(
+                    'clearEsiCache',
+                    array('Widget', $this->getGlobalPlaceholderNames())
+                );
+            }
         }
     }
 
@@ -1495,6 +1526,12 @@ JSCODE;
             }
         }
 
+        // Clear cache
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getEvents()->triggerEvent(
+            'clearEsiCache',
+            array('Widget', $this->getGlobalPlaceholderNames())
+        );
         return true;
     }
 
@@ -1503,7 +1540,20 @@ JSCODE;
     {
         global $objDatabase;
 
-        $objResult = $objDatabase->Execute("UPDATE ".DBPREFIX."module_".$this->moduleTablePrefix."_entries SET duration_notification='".intval($bolStatus)."' WHERE id='".intval($intEntryId)."'");
+        $objResult = $objDatabase->Execute(
+            'UPDATE `' . DBPREFIX . 'module_' . $this->moduleTablePrefix . '_entries`
+                SET `duration_notification` = "' . intval($bolStatus) . '"
+                WHERE `id` = "' . intval($intEntryId) . '"'
+        );
+
+        if ($objResult) {
+            // Clear cache
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cx->getEvents()->triggerEvent(
+                'clearEsiCache',
+                array('Widget', $this->getGlobalPlaceholderNames())
+            );
+        }
     }
 
     /**
