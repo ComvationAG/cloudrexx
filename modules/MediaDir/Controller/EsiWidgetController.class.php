@@ -29,7 +29,7 @@
  * Class EsiWidgetController
  *
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
- * @author      Project Team SS4U <info@comvation.com>
+ * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  module_mediadir
  * @version     1.0.0
@@ -44,7 +44,7 @@ namespace Cx\Modules\MediaDir\Controller;
  * - Register it as a Controller in your ComponentController
  *
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
- * @author      Project Team SS4U <info@comvation.com>
+ * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  module_mediadir
  * @version     1.0.0
@@ -52,24 +52,25 @@ namespace Cx\Modules\MediaDir\Controller;
 
 class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetController {
     /**
-     * currentThemeId
-     *
-     * @var integer
-     */
-    protected $currentThemeId;
-
-    /**
      * Parses a widget
-     * @param string $name Widget name
-     * @param \Cx\Core\Html\Sigma Widget template
-     * @param string $locale RFC 3066 locale identifier
+     *
+     * @param string                                 $name     Widget name
+     * @param \Cx\Core\Html\Sigma                    $template Widget template
+     * @param \Cx\Core\Routing\Model\Entity\Response $response Response object
+     * @param array                                  $params   Get parameters
+     *
+     * @return null
      */
-    public function parseWidget($name, $template, $locale)
+    public function parseWidget($name, $template, $response, $params)
     {
         global $_ARRAYLANG, $_LANGID;
 
+        //The global $_LANGID is required in the following methods
+        //MediaDirectoryPlaceholders::getNavigationPlacholder(),
+        //MediaDirectoryPlaceholders::getLatestPlacholder(),
+        //MediaDirectory::getLatestEntries(),
+        $_LANGID = $params['lang'];
         // Show Level/Category Navbar
-        $_LANGID = \FWLanguage::getLangIdByIso639_1($locale);
         $mediaDirPlaceholders = new MediaDirectoryPlaceholders('MediaDir');
         if ($name == 'MEDIADIR_NAVBAR') {
             $template->setVariable(
@@ -89,10 +90,6 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
         }
 
         //Show Latest MediaDir entries
-        $_ARRAYLANG = array_merge(
-            $_ARRAYLANG,
-            \Env::get('init')->loadLanguageData('MediaDir')
-        );
         $mediadir   = new MediaDirectory('', 'MediaDir');
         $matches    = null;
         if (
@@ -111,46 +108,33 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
         }
 
         //Show the Latest MediaDir entries based on the MediaDir Form
-        if ($name == 'mediadirLatest') {
-            $mediadirForms = new \Cx\Modules\MediaDir\Controller\MediaDirectoryForm(
-                null,
-                'MediaDir'
+        if ($name !== 'mediadirLatest') {
+            return;
+        }
+        $mediadirForms = new \Cx\Modules\MediaDir\Controller\MediaDirectoryForm(
+            null,
+            'MediaDir'
+        );
+        $foundOne = false;
+        foreach ($mediadirForms->getForms() as $key => $arrForm) {
+            if (
+                !$template->blockExists(
+                    'mediadirLatest_form_' . $arrForm['formCmd']
+                )
+            ) {
+                continue;
+            }
+            $mediadir->getLatestEntries(
+                $template,
+                $key,
+                'mediadirLatest_form_'.$arrForm['formCmd']
             );
-            $foundOne = false;
-            foreach ($mediadirForms->getForms() as $key => $arrForm) {
-                if (
-                    $template->blockExists(
-                        'mediadirLatest_form_' . $arrForm['formCmd']
-                    )
-                ) {
-                    $mediadir->getLatestEntries(
-                        $template,
-                        $key,
-                        'mediadirLatest_form_'.$arrForm['formCmd']
-                    );
-                    $foundOne = true;
-                }
-            }
-
-            //for the backward compatibility
-            if (!$foundOne) {
-                $mediadir->getLatestEntries($template);
-            }
+            $foundOne = true;
         }
-    }
 
-    /**
-     * Returns the content of a widget
-     *
-     * @param array $params JsonAdapter parameters
-     *
-     * @return array Content in an associative array
-     */
-    public function getWidget($params)
-    {
-        if (isset($params['get']) && isset($params['get']['theme'])) {
-            $this->currentThemeId = $params['get']['theme'];
+        //for the backward compatibility
+        if (!$foundOne) {
+            $mediadir->getLatestEntries($template);
         }
-        return parent::getWidget($params);
     }
 }
