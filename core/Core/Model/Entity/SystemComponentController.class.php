@@ -351,19 +351,6 @@ class SystemComponentController extends Controller {
     public function registerEventListeners() {}
 
     /**
-     * Called for additional, component specific resolving
-     *
-     * If /en/Path/to/Page is the path to a page for this component
-     * a request like /en/Path/to/Page/with/some/parameters will
-     * give an array like array('with', 'some', 'parameters') for $parts
-     *
-     * This may be used to redirect to another page
-     * @param array $parts List of additional path parts
-     * @param \Cx\Core\ContentManager\Model\Entity\Page $page Resolved virtual page
-     */
-    public function resolve($parts, $page) {}
-
-    /**
      * Do something before resolving is done
      *
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
@@ -371,6 +358,21 @@ class SystemComponentController extends Controller {
      * @param \Cx\Core\Routing\Url                      $request    The URL object for this request
      */
     public function preResolve(\Cx\Core\Routing\Url $request) {}
+
+    /**
+     * Called for additional, component specific resolving
+     *
+     * If /en/Path/to/Page is the path to a page for this component
+     * a request like /en/Path/to/Page/with/some/parameters will
+     * give an array like array('with', 'some', 'parameters') for $parts
+     * PLEASE MAKE SURE THIS METHOD IS MOCKABLE. IT MAY ONLY INTERACT WITH
+     * adjustResponse() HOOK.
+     *
+     * This may be used to redirect to another page
+     * @param array $parts List of additional path parts
+     * @param \Cx\Core\ContentManager\Model\Entity\Page $page Resolved virtual page
+     */
+    public function resolve($parts, $page) {}
 
     /**
      * Do something after resolving is done
@@ -400,6 +402,17 @@ class SystemComponentController extends Controller {
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function preContentParse(\Cx\Core\ContentManager\Model\Entity\Page $page){}
+
+    /**
+     * Do something with a Response object
+     * You may do page alterations here (like changing the metatitle)
+     * You may do response alterations here (like set headers)
+     * PLEASE MAKE SURE THIS METHOD IS MOCKABLE. IT MAY ONLY INTERACT WITH
+     * resolve() HOOK.
+     *
+     * @param \Cx\Core\Routing\Model\Entity\Response $response Response object to adjust
+     */
+    public function adjustResponse(\Cx\Core\Routing\Model\Entity\Response $response) {}
 
     /**
      * Load your component. It is needed for this request.

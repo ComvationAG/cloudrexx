@@ -90,20 +90,26 @@ abstract class EsiWidgetController extends \Cx\Core\Core\Model\Entity\Controller
      * @return array Content in an associative array
      */
     public function getWidget($params) {
-        $requiredParams = array(
+        if (
+            !isset($params['get']) ||
+            !isset($params['get']['name'])
+        ) {
+            throw new \InvalidArgumentException('Param "name" not set');
+        }
+        $widget = $this->getComponent('Widget')->getWidget($params['get']['name']);
+        $requiredParamsForWidgetsWithContent = array(
             'theme',
             'page',
             'lang',
-            'name',
             'targetComponent',
             'targetEntity',
             'targetId',
             'channel',
         );
-        if (isset($params['get'])) {
-            $params['get'] = contrexx_input2raw($params['get']);
-        } else {
-            $params['get'] = array();
+        // TODO: We should check at least all ESI params of this widget
+        $requiredParams = array();
+        if ($widget->hasContent()) {
+            $requiredParams = $requiredParamsForWidgetsWithContent;
         }
         foreach ($requiredParams as $requiredParam) {
             if (!isset($params['get'][$requiredParam])) {
@@ -113,11 +119,15 @@ abstract class EsiWidgetController extends \Cx\Core\Core\Model\Entity\Controller
 
         // ensure that the params can be fetched during internal parsing
         $backupGetParams = $_GET;
+        $backupRequestParams = $_REQUEST;
         $_GET = $params['get'];
+        $_REQUEST = $params['get'];
+        if (isset($params['post'])) {
+            $_REQUEST += $params['post'];
+        }
 
         // resolve widget template
         $widgetContent = '';
-        $widget = $this->getComponent('Widget')->getWidget($params['get']['name']);
         if (!$widget->hasContent()) {
             $widgetContent = '{' . $params['get']['name'] . '}';
         } else {
@@ -137,6 +147,8 @@ abstract class EsiWidgetController extends \Cx\Core\Core\Model\Entity\Controller
             }
         }
         $widgetTemplate = new \Cx\Core\Html\Sigma();
+        \LinkGenerator::parseTemplate($widgetContent);
+        $this->cx->parseGlobalPlaceholders($widgetContent);
         $widgetTemplate->setTemplate($widgetContent);
         $this->getComponent('Widget')->parseWidgets(
             $widgetTemplate,
@@ -145,13 +157,18 @@ abstract class EsiWidgetController extends \Cx\Core\Core\Model\Entity\Controller
             $params['get']['targetId'],
             array($params['get']['name'])
         );
+        $params['get'] = $this->objectifyParams($params['get']);
         $this->parseWidget(
             $params['get']['name'],
             $widgetTemplate,
-            $params['get']['lang']
+            $params['response'],
+            $params['get']
         );
         $_GET = $backupGetParams;
+        $_REQUEST = $backupRequestParams;
         $content = $widgetTemplate->get();
+
+        $content = preg_replace('/\\[\\[([A-Z0-9_-]+)\\]\\]/', '{\\1}', $content);
         \LinkGenerator::parseTemplate($content);
         $ls = new \LinkSanitizer(
             $this->cx,
@@ -164,10 +181,70 @@ abstract class EsiWidgetController extends \Cx\Core\Core\Model\Entity\Controller
     }
 
     /**
+     * This makes object of the given params (if possible)
+     * Known params are page, lang, user, theme, channel, country and currency
+     * @param array $params Associative array of params
+     * @return array Associative array of params
+     */
+    protected function objectifyParams($params) {
+        $possibleParams = array(
+            'page' => function($pageId) {
+                $em = $this->cx->getDb()->getEntityManager();
+                $pageRepo = $em->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
+                $page = $pageRepo->findOneById($pageId);
+                return $page;
+            },
+            'lang' => function($langCode) {
+                // this should return a locale object
+                $langId = \FWLanguage::getLanguageIdByCode($langCode);
+
+                // load component language data
+                global $_ARRAYLANG;
+                $_ARRAYLANG = array_merge(
+                    $_ARRAYLANG,
+                    \Env::get('init')->getComponentSpecificLanguageData(
+                        parent::getName(),
+                        true,
+                        $langId
+                    )
+                );
+                return $langId;
+            },
+            'user' => function($userId) {
+                return \FWUser::getFWUserObject()->objUser->getUser($userId);
+            },
+            'theme' => function($themeId) {
+                $themeRepo = new \Cx\Core\View\Model\Repository\ThemeRepository();
+                $theme = $themeRepo->findById($themeId);
+                return $theme;
+            },
+            'channel' => function($channel) {
+                return $channel;
+            },
+            'country' => function($countryCode) {
+                // this should return a country object
+                return $countryCode;
+            },
+            'currency' => function($currencyCode) {
+                // this should return a currency object
+                return $currencyCode;
+            },
+        );
+        foreach ($possibleParams as $possibleParam=>$callback) {
+            if (!isset($params[$possibleParam])) {
+                continue;
+            }
+            $params[$possibleParam] = $callback($params[$possibleParam]);
+        }
+        return $params;
+    }
+
+    /**
      * Parses a widget
      * @param string $name Widget name
      * @param \Cx\Core\Html\Sigma Widget template
-     * @param string $locale RFC 3066 locale identifier
+     * @param \Cx\Core\Routing\Model\Entity\Response $response Current response
+     * @param array $params Array of params
      */
-    public abstract function parseWidget($name, $template, $locale);
+    public abstract function parseWidget($name, $template, $response, $params);
 }

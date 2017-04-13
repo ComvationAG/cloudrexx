@@ -71,7 +71,7 @@ class JsonData {
      * List of adapters to use (they have to implement the JsonAdapter interface)
      * @var Array List of JsonAdapters
      */
-    protected $adapters = array();
+    protected static $adapters = array();
     /**
      * Session id for request which we got from the login request
      * @var string $sessionId
@@ -83,6 +83,10 @@ class JsonData {
      * @author Michael Ritter <michael.ritter@comvation.com>
      */
     public function __construct() {
+        if (count(static::$adapters)) {
+            return;
+        }
+
         foreach (self::$adapter_classes as $ns=>$adapters) {
             foreach ($adapters as $adapter) {
                 $this->loadAdapter($adapter, $ns);
@@ -158,7 +162,7 @@ class JsonData {
             return;
             //throw new \Exception('JsonAdapter controller could not be found: "' . $adapter . '"');
         }
-        $this->adapters[$object->getName()] = $object;
+        static::$adapters[$object->getName()] = $object;
     }
 
     /**
@@ -172,7 +176,7 @@ class JsonData {
             $object = new $adapter();
         }
         \Env::get('init')->loadLanguageData($object->getName());
-        $this->adapters[$object->getName()] = $object;
+        static::$adapters[$object->getName()] = $object;
     }
 
     /**
@@ -198,11 +202,11 @@ class JsonData {
 
     /**
      * Parses a Response into JSON
-     * @param \Cx\Lib\Net\Model\Entity\Response $response Data to JSONify
+     * @param \Cx\Core\Routing\Model\Entity\Response $response Data to JSONify
      * @param boolean $setContentType (optional) If true (NOT default) the content type is set to application/json
      * @return String JSON data to return to client
      */
-    public function json(\Cx\Lib\Net\Model\Entity\Response $response, $setContentType = false) {
+    public function json(\Cx\Core\Routing\Model\Entity\Response $response, $setContentType = false) {
         $response->setParser($this->getParser());
         $parsedContent = $response->getParsedContent();
         if ($setContentType) {
@@ -219,8 +223,8 @@ class JsonData {
     /**
      * Returns the parser used to parse JSON
      * Parser is either a callback function which accepts an instance of
-     * \Cx\Lib\Net\Model\Entity\Response as first argument or an object with a
-     * parse(\Cx\Lib\Net\Model\Entity\Response $response) method.
+     * \Cx\Core\Routing\Model\Entity\Response as first argument or an object with a
+     * parse(\Cx\Core\Routing\Model\Entity\Response $response) method.
      * @return Object|callable Parser
      */
     public function getParser() {
@@ -236,7 +240,7 @@ class JsonData {
      * @return string JSON encoded data
      */
     public function parse(array $data) {
-        $response = new \Cx\Lib\Net\Model\Entity\Response($data);
+        $response = new \Cx\Core\Routing\Model\Entity\Response($data);
         $response->setParser($this->getParser());
         return $response->getParsedContent();
     }
@@ -253,10 +257,10 @@ class JsonData {
     public function data($adapter, $method, $arguments = array()) {
         global $_ARRAYLANG;
 
-        if (!isset($this->adapters[$adapter])) {
+        if (!isset(static::$adapters[$adapter])) {
             return $this->getErrorData('No such adapter');
         }
-        $adapter = $this->adapters[$adapter];
+        $adapter = static::$adapters[$adapter];
         $methods = $adapter->getAccessableMethods();
         $realMethod = '';
 

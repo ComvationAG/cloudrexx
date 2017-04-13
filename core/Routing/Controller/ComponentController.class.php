@@ -120,4 +120,46 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             }
         }
     }
+
+    /**
+     * Do something after resolving is done
+     *
+     * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
+     * CALCULATE YOUR STUFF AS LATE AS POSSIBLE
+     * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
+     */
+    public function postResolve(\Cx\Core\ContentManager\Model\Entity\Page $page)
+    {
+        // TODO: The registration of widgets must not be done here.
+        //       Instead the registration must be done in postInit hook.
+
+        // Initialize value of FinalStringWidget CANONICAL_LINK as empty
+        // string for the case when the requested page does not have a
+        // canonical-link.
+        $link = '';
+
+        // fetch canonical-link
+        $headers = \Env::get('Resolver')->getHeaders();
+        if (
+            isset($headers['Link']) &&
+            preg_match('/^<([^>]+)>;\s+rel="canonical"/', $headers['Link'], $matches)
+        ) {
+            $canonicalLink = $matches[1];
+            
+            $link = new \Cx\Core\Html\Model\Entity\HtmlElement('link');
+            $link->setAttribute('rel', 'canonical');
+            $link->setAttribute('href', $canonicalLink);
+        }
+
+        // TODO: Once each componet will have implemented a proper resolve hook
+        //       the CANONICAL_LINK widget shall be converted into an EsiWidget.
+        $this->getComponent('Widget')->registerWidget(
+            new \Cx\Core_Modules\Widget\Model\Entity\FinalStringWidget(
+                $this,
+                'CANONICAL_LINK',
+                (string) $link
+            )
+        );
+
+    }
 }

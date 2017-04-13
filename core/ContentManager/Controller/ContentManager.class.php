@@ -298,7 +298,7 @@ class ContentManager extends \Module
             'getTree',
             array(
                 'get' => $_GET,
-                'response' => new \Cx\Lib\Net\Model\Entity\Response(null),
+                'response' => new \Cx\Core\Routing\Model\Entity\Response(null),
             ),
             false
         );
@@ -389,7 +389,7 @@ class ContentManager extends \Module
                 'page',
                 'getAccessData',
                 array(
-                    'response' => new \Cx\Lib\Net\Model\Entity\Response(null),
+                    'response' => new \Cx\Core\Routing\Model\Entity\Response(null),
                 ),
                 false
             ),
@@ -404,7 +404,7 @@ class ContentManager extends \Module
                 'Block',
                 'getBlocks',
                 array(
-                    'response' => new \Cx\Lib\Net\Model\Entity\Response(null),
+                    'response' => new \Cx\Core\Routing\Model\Entity\Response(null),
                 ),
                 false
             ),

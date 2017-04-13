@@ -258,13 +258,6 @@ class CalendarEventManager extends CalendarLibrary
             } else {
                 $showIn_where = "";
             }
-
-            $objFWUser = \FWUser::getFWUserObject();
-            if ($objFWUser->objUser->login()) {
-                $needAuth_where = '';
-            } else {
-                $needAuth_where = ' AND event.access=0';
-            }
         }
 
         if ($this->endDate !== null) {
@@ -309,7 +302,6 @@ class CalendarEventManager extends CalendarLibrary
                          ".$searchTerm_DB."
                    WHERE ".$dateScope_where."
                          ".$onlyActive_where."
-                         ".$needAuth_where."
                          ".$categoryId_where."
                          ".$searchTerm_where."
                          ".$showIn_where."
@@ -321,8 +313,19 @@ class CalendarEventManager extends CalendarLibrary
         $objResult = $objDatabase->Execute($query);
 
         if ($objResult !== false) {
+            $objFWUser = \FWUser::getFWUserObject();
             while (!$objResult->EOF) {
                 $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent(intval($objResult->fields['id']));
+
+                if ($objEvent->access) {
+                    // cache userbased
+                    $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                    $cx->getComponent('Cache')->forceUserbasedPageCache();
+                    if (!$objFWUser->objUser->login()) {
+                        $objResult->MoveNext();
+                        continue;
+                    }
+                }
 
                 if($objInit->mode == 'frontend' || $this->showSeries) {
                     $checkFutureEvents = true;

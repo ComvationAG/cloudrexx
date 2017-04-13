@@ -214,9 +214,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      *
      * This event must be registered in the postInit-Hook definition
      * file config/postInitHooks.yml.
-     * @param \Cx\Core\Core\Controller\Cx $cx The instance of \Cx\Core\Core\Controller\Cx
+     * @param \Cx\Core\Core\Controller\Cx   $cx The instance of \Cx\Core\Core\Controller\Cx
      */
-    public function postInit()
+    public function postInit(\Cx\Core\Core\Controller\Cx $cx)
     {
         $widgetController = $this->getComponent('Widget');
         foreach (
@@ -244,7 +244,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             }
         }
 
-        $widgetNames = array(
+        $widgetNames     = array(
             'access_currently_online_member_list',
             'access_last_active_member_list',
             'access_latest_registered_member_list',

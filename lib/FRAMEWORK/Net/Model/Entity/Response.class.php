@@ -99,6 +99,11 @@ class Response {
     protected $parsedContent;
 
     /**
+     * @var array List of headers (key=>value)
+     */
+    protected $headers = array();
+
+    /**
      * Creates a new Response
      * @param mixed $abstract Abstract response data
      * @param int $code (optional) Response code, default is 200
@@ -261,6 +266,49 @@ class Response {
     }
 
     /**
+     * Sets a header
+     * For 'Content-Type' or 'Expires' headers please use
+     * setContentType() and setExpirationDate()
+     * @param string $key Header key
+     * @param string $value Header value
+     * @throws ResponseException When trying to set 'Content-Type' or 'Expires' header
+     */
+    public function setHeader($key, $value) {
+        if ($key == 'Content-Type') {
+            throw new ResponseException('Please use setContentType()');
+        } else if ($key == 'Expires') {
+            throw new ResponseException('Please use setExpirationDate()');
+        }
+        if (empty($value)) {
+            unset($this->headers[$key]);
+        } else {
+            $this->headers[$key] = $value;
+        }
+    }
+
+    /**
+     * Returns a header's value
+     * @param string $key Header key
+     * @throws ResponseException When trying to get a non-set header
+     * @return string Header value
+     */
+    public function getHeader($key) {
+        if (!isset($this->headers[$key])) {
+            throw new ResponseException('No such header set');
+        }
+        return $this->headers[$key];
+    }
+
+    /**
+     * Returns a list of headers
+     * Please note that this does not include 'Content-Type' and 'Expires' headers
+     * @return array Key=>value type array
+     */
+    public function getHeaders() {
+        return $this->headers;
+    }
+
+    /**
      * Sends this response to browser
      * @throws ResponseException If content type is not set
      */
@@ -277,6 +325,9 @@ class Response {
         header('Content-Type: ' . $this->getContentType());
         if ($this->getExpirationDate()) {
             header('Expires: ' . $this->getExpirationDate()->format('r'));
+        }
+        foreach ($this->getHeaders() as $key=>$value) {
+            header($key . ': ' . $value);
         }
         die($this->getParsedContent());
     }

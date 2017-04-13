@@ -1562,7 +1562,7 @@ class CalendarManager extends CalendarLibrary
     {
         global $_ARRAYLANG;
 
-        \JS::activate('jquery-cookie');
+        \JS::activate('js-cookie');
         $this->_objTpl->loadTemplateFile('module_calendar_registrations.html');
         $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent(intval($eventId));
 

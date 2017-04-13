@@ -217,6 +217,14 @@ class ComponentHandler {
     }
 
     /**
+     * Calls hook scripts to adjust response object (this is newer than legacy)
+     * @param \Cx\Core\Routing\Model\Entity\Response $response Current response
+     */
+    public function callAdjustResponseHooks($response) {
+        $this->systemComponentRepo->callAdjustResponseHooks($response);
+    }
+
+    /**
      * Calls hook scripts on legacy and non-legacy components before loading content
      */
     public function callPreContentLoadHooks() {

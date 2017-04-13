@@ -30,6 +30,46 @@ namespace Cx\Core\Core\Controller;
 
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getControllerClasses()
+    {
+        return array('EsiWidget');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getControllersAccessableByJson()
+    {
+        return array('EsiWidgetController');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function postInit(\Cx\Core\Core\Controller\Cx $cx)
+    {
+        $widgetController = $this->getComponent('Widget');
+        $widgetController->registerWidget(
+            new \Cx\Core_Modules\Widget\Model\Entity\FinalStringWidget(
+                $this,
+                'PATH_OFFSET',
+                $this->cx->getCodeBaseOffsetPath()
+            )
+        );
+
+        foreach (array('BASE_URL', 'VERSION') as $widgetName) {
+            $widgetController->registerWidget(
+                new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+                    $this,
+                    $widgetName
+                )
+            );
+        }
+    }
+
     public function getCommandsForCommandMode() {
         return array('help', 'status', 'diff', 'version', 'info', 'install', 'uninstall');
     }

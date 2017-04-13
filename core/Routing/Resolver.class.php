@@ -420,15 +420,6 @@ class Resolver {
             $canonicalPage = $this->pageRepo->getTargetPage($this->urlPage);
         }
 
-        // don't set canonical page when replying with an application page
-        // since we can't know which application pages share the same content.
-        // Exception to this rule: if we're not on main domain, we know that
-        // the canonical version is the same page using the main domain.
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $domainRepo = $cx->getDb()->getEntityManager()->getRepository(
-            'Cx\Core\Net\Model\Entity\Domain'
-        );
-
         // set canonical page only in case it hasn't been set already
         $linkHeader = preg_grep('/^Link:.*canonical["\']$/', headers_list());
         if ($linkHeader) {
@@ -438,9 +429,12 @@ class Resolver {
             $this->headers['Link'] = $link;
         }
 
+        // don't set canonical page when replying with an application page
+        // since we can't know which application pages share the same content.
+        // TODO: this should be handled by the affected components themself
         if (
             $canonicalPage->getType() == \Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION &&
-            $this->url->getDomain() == $domainRepo->getMainDomain()->getName()
+            !in_array($canonicalPage->getModule(), array('Home', 'Sitemap', 'Agb', 'Imprint', 'Privacy', 'Ids'))
         ) {
             return $this->page;
         }
@@ -1015,6 +1009,10 @@ class Resolver {
      * @return array key=>value style array
      */
     public function getHeaders() {
+        $response = \Cx\Core\Core\Controller\Cx::instanciate()->getResponse();
+        if ($response->getExpirationDate()) {
+            $this->headers['Expires'] = $response->getExpirationDate()->format('r');
+        }
         return $this->headers;
     }
 }

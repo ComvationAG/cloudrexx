@@ -77,6 +77,12 @@ class LinkSanitizer {
             # but only those who's values don't start with a slash..
             (?=[^\/])
 
+            # ..and neither start with a SSI-tag
+            (?!<!--\#[a-z]+\s+)
+
+            # ..and neither start with a ESI-tag
+            (?!<esi:)
+
             # ..and neither start with a protocol (http:, ftp:, javascript:, mailto:, etc)
             (?![a-zA-Z]+:)
 

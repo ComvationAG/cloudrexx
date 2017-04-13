@@ -39,6 +39,14 @@ use Cx\Core\Html\Sigma;
 use Cx\Model\Base\EntityBase;
 
 /**
+ * Class MediaBrowserException
+ *
+ * @copyright   Cloudrexx AG
+ * @author      Manuel Schenk <manuel.schenk@comvation.com>
+ */
+class MediaBrowserException extends \Exception {}
+
+/**
  * Class MediaBrowser
  *
  * @copyright   Cloudrexx AG
@@ -63,13 +71,45 @@ class MediaBrowser extends EntityBase
     protected $options = array();
 
     /**
+     * @var SystemComponentController $systemComponentController
+     */
+    protected $systemComponentController;
+
+    /**
+     * @var string $entity
+     */
+    protected $entity;
+
+
+    /**
      * Create new instance of mediabrowser and register in componentcontroller.
      *
-     * @throws \Cx\Core\Core\Model\Entity\SystemComponentException
-     * @throws \Exception
+     * @param SystemComponentController $systemComponentController MediaBrowser instantiated with optional SystemComponentController
+     * @param string $entity MediaBrowser instantiated with optional entity
+     * @throws MediaBrowserException If no $systemComponentController is provided and none can be found
      */
-    function __construct()
+    function __construct(SystemComponentController $systemComponentController = null, $entity = '')
     {
+        // Sets provided SystemComponentController
+        $this->systemComponentController = $systemComponentController;
+        if (!$this->systemComponentController) {
+            // Searches a SystemComponentController intelligently by RegEx on backtrace stack frame
+            $traces = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+            $trace = end($traces);
+            if (empty($trace['class'])) {
+                throw new MediaBrowserException('No SystemComponentController for MediaBrowser can be found');
+            }
+            $matches = array();
+            preg_match(
+                '/Cx\\\\(?:Core|Core_Modules|Modules)\\\\([^\\\\]*)\\\\/',
+                $trace['class'],
+                $matches
+            );
+            $this->systemComponentController = $this->getComponent($matches[1]);
+        }
+
+        $this->entity = $entity;
+
         $this->getComponentController()->addMediaBrowser($this);
 
         $this->options = array(
@@ -77,7 +117,6 @@ class MediaBrowser extends EntityBase
             'class' => "mediabrowser-button button"
         );
     }
-
 
     /**
      * Set a mediabrowser option

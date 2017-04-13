@@ -646,27 +646,4 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
 
         $objTemplate->SetVariable('CONTENT_OK_MESSAGE', $_ARRAYLANG['TXT_CACHE_EMPTY_SUCCESS']);
     }
-
-
-    /**
-     * Delete all specific file from cache-folder
-     *
-     * @global     object    $objDatabase
-     */
-    function deleteSingleFile($intPageId)
-    {
-        global $objDatabase;
-
-        $intPageId = intval($intPageId);
-        if ( 0 < $intPageId ) {
-            $files = glob( $this->strCachePath . '*_' . $intPageId );
-            if ( count( $files ) ) {
-                foreach ( $files as $file ) {
-                    @unlink( $file );
-                }
-            }
-        }
-    }
 }
-
-?>

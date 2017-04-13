@@ -745,6 +745,10 @@ class Config
         try {
             $objFile = new \Cx\Lib\FileSystem\File(self::getSettingsFile());
             $objFile->write($data);
+
+            // Drop complete cache (page and ESI)
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cx->getComponent('Cache')->clearCache();
             return true;
         } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
             \DBG::msg($e->getMessage());

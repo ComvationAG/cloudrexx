@@ -81,6 +81,41 @@ class Sigma extends \HTML_Template_Sigma {
         return $return;
     }
 
+    function replaceBlock($block, $template, $keepContent = false, $outer = false) {
+        if (!$outer) {
+            return parent::replaceBlock($block, $template, $keepContent);
+        }
+
+        // ensure placeholder is not in $template
+        $matches = array();
+        if (
+            preg_match(
+                $this->blockRegExp,
+                $template,
+                $matches
+            ) &&
+            $matches[1] == $block
+        ) {
+            $template = $matches[2];
+        }
+
+        // replace block placeholder
+        $placeholder = $this->openingDelimiter.'__'.$block.'__'.$this->closingDelimiter;
+        foreach ($this->_blocks as $outerBlock=>&$content) {
+            $content = str_replace(
+                $placeholder,
+                $template,
+                $content
+            );
+        }
+
+        // remove block
+        $this->_removeBlockData($block, false);
+
+        // Renew variable list
+        return $this->_buildBlockVariables();
+    }
+
     /**
      * The customizing mechanism does not apply to method _getCached().
      * Therefore it is not overwritten.

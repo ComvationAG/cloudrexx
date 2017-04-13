@@ -2671,7 +2671,7 @@ cx.cm.loadHistory = function(id, pos) {
         }
     }
 
-    cx.jQuery("#page_history").html("<div class=\"historyInit\"><img src=\"../lib/javascript/jquery/jstree/themes/default/throbber.gif\" alt=\"Loading...\" /></div>");
+    cx.jQuery("#page_history").html("<div class=\"historyInit\"><img src=\"" + cx.variables.get('basePath', 'contrexx') + "lib/javascript/jquery/jstree/themes/default/throbber.gif\" alt=\"Loading...\" /></div>");
     pageId = (id != undefined) ? parseInt(id) : parseInt(cx.jQuery('#pageId').val());
     if (isNaN(pageId) || (pageId == 0)) {
         return;

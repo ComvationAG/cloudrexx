@@ -126,7 +126,7 @@ class Egov extends EgovLibrary
             )");
         $order_id = $objDatabase->Insert_ID();
         if (self::GetProduktValue('product_per_day', $product_id) == 'yes') {
-            list ($calD, $calM, $calY) = explode('[.]', contrexx_input2raw($_REQUEST['contactFormField_1000']));
+            list ($calD, $calM, $calY) = explode('.', contrexx_input2raw($_REQUEST['contactFormField_1000']));
             for($x = 0; $x < $quantity; ++$x) {
                 $objDatabase->Execute("
                     INSERT INTO ".DBPREFIX."module_egov_product_calendar (

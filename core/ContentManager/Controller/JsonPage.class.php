@@ -775,7 +775,7 @@ class JsonPage implements JsonAdapter {
             $this->multipleSetState['state'] = 'timeout';
             $jd = new \Cx\Core\Json\JsonData();
             echo $jd->json(
-                new \Cx\Lib\Net\Model\Entity\Response($this->multipleSetState)
+                new \Cx\Core\Routing\Model\Entity\Response($this->multipleSetState)
             );
         }
     }

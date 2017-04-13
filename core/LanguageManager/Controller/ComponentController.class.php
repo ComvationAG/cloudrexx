@@ -110,10 +110,30 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     protected $componentsWithLoadedLang = array();
 
-    public function getControllerClasses() {
-        // Return an empty array here to let the component handler know that there
-        // does not exist a backend, nor a frontend controller of this component.
-        return array();
+    /**
+     * Returns all Controller class names for this component (except this)
+     *
+     * Be sure to return all your controller classes if you add your own
+     * @return array List of Controller class names (without namespace)
+     */
+    public function getControllerClasses()
+    {
+        return array('EsiWidget');
+    }
+
+    /**
+     * Returns a list of JsonAdapter class names
+     *
+     * The array values might be a class name without namespace. In that case
+     * the namespace \Cx\{component_type}\{component_name}\Controller is used.
+     * If the array value starts with a backslash, no namespace is added.
+     *
+     * Avoid calculation of anything, just return an array!
+     * @return array List of ComponentController classes
+     */
+    public function getControllersAccessableByJson()
+    {
+        return array('EsiWidgetController');
     }
 
     public function registerEventListeners() {
@@ -315,5 +335,46 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $text
         );
         return $text;
+    }
+
+    /**
+     * Do something after system initialization
+     *
+     * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
+     * CALCULATE YOUR STUFF AS LATE AS POSSIBLE.
+     * This event must be registered in the postInit-Hook definition
+     * file config/postInitHooks.yml.
+     *
+     * @param \Cx\Core\Core\Controller\Cx $cx The instance of \Cx\Core\Core\Controller\Cx
+     */
+    public function postInit(\Cx\Core\Core\Controller\Cx $cx)
+    {
+        $widgetController = $this->getComponent('Widget');
+        $langManager      = new LanguageManager();
+        $widgetNames      = array(
+            'CHARSET',
+            'LANGUAGE_NAVBAR',
+            'LANGUAGE_NAVBAR_SHORT',
+            'ACTIVE_LANGUAGE_NAME'
+        );
+
+        foreach (
+            array_merge(
+                $widgetNames,
+                $langManager->getLanguagePlaceholderNames()
+            ) as $widgetName
+        ) {
+            $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+                $this,
+                $widgetName
+            );
+            $widget->setEsiVariable(
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_THEME |
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_CHANNEL
+            );
+            $widgetController->registerWidget(
+                $widget
+            );
+        }
     }
 }

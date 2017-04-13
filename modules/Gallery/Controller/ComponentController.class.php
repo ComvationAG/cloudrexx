@@ -62,15 +62,6 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 $objGallery = new Gallery(\Env::get('cx')->getPage()->getContent());
                 \Env::get('cx')->getPage()->setContent($objGallery->getPage());
-
-                $topGalleryName = $objGallery->getTopGalleryName();
-                if ($topGalleryName) {
-                    \Env::get('cx')->getPage()->setTitle($topGalleryName);
-                    \Env::get('cx')->getPage()->setContentTitle($topGalleryName);
-                    \Env::get('cx')->getPage()->setMetaTitle($topGalleryName);
-                    \Env::get('cx')->getPage()->setMetadesc($topGalleryName);
-                }
-
                 break;
 
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:

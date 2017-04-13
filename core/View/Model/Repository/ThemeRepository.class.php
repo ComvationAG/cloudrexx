@@ -53,6 +53,11 @@ class ThemeRepository
      */
     private $db;
 
+    /**
+     * @var array ID=>\Cx\Core\View\Model\Entity\Theme
+     */
+    protected static $loadedThemes = array();
+
     public function __construct() {
         $this->db = \Env::get('db');
     }
@@ -129,15 +134,19 @@ class ThemeRepository
      * @return \Cx\Core\View\Model\Entity\Theme the theme
      */
     public function findById($id) {
+        if (isset(static::$loadedThemes[$id])) {
+            return static::$loadedThemes[$id];
+        }
         $result = $this->db->SelectLimit('SELECT `id`, `themesname`, `foldername`, `expert` FROM `'.DBPREFIX.'skins` WHERE `id` = '.intval($id), 1);
         if ($result !== false && !$result->EOF) {
-            return $this->getTheme(
+            static::$loadedThemes[$id] =  $this->getTheme(
                 $result->fields['id'],
                 $result->fields['themesname'],
                 $result->fields['foldername'],
                 $result->fields['expert'],
                 null
             );
+            return static::$loadedThemes[$id];
         }
         return null;
     }

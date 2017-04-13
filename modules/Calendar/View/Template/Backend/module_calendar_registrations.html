@@ -84,7 +84,7 @@
             cx.jQuery('.csv-file').attr('checked', 'checked');
             cx.jQuery('.csv-excel-file').removeAttr('checked');
 
-            var fileFormat = cx.jQuery.cookie('format');
+            var fileFormat = Cookies.get('format');
             if (fileFormat && fileFormat === 'export_csv_excel') {
                 cx.jQuery('.csv-excel-file').attr('checked', 'checked');
                 cx.jQuery('.csv-file').removeAttr('checked');
@@ -101,7 +101,7 @@
                     "{TXT_CALENDAR_EXPORT_EXPORT}": function() {
                         var exportFormat = cx.jQuery('input[name=export]:checked').val();
                         var url = "index.php?cmd={CALENDAR_MODULE_NAME}&act=export_registrations&id={CALENDAR_EVENT_ID}&format=" + exportFormat + "&{CALENDAR_CSRF}";
-                        cx.jQuery.cookie("format", exportFormat);
+                        Cookies.set("format", exportFormat);
                         window.location.href = url;
                         cx.jQuery(this).dialog("close");
                     }
