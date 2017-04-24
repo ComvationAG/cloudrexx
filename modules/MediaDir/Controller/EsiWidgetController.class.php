@@ -58,8 +58,6 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
      * @param \Cx\Core\Html\Sigma                    $template Widget template
      * @param \Cx\Core\Routing\Model\Entity\Response $response Response object
      * @param array                                  $params   Get parameters
-     *
-     * @return null
      */
     public function parseWidget($name, $template, $response, $params)
     {
