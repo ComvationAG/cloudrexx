@@ -1130,7 +1130,8 @@ JSCODE;
                             $objTpl,
                             $arrEntry['entryDurationType'],
                             $arrEntry['entryDurationStart'],
-                            $arrEntry['entryDurationEnd']
+                            $arrEntry['entryDurationEnd'],
+                            $varPrefixUC
                         );
 
                         $i++;
@@ -1151,8 +1152,11 @@ JSCODE;
      * @param int $type if the duration is a time period or unlimited
      * @param int $startDate start date as unix timestamp
      * @param int $endDate end date as unix timestamp
+     * @param string $prefix custom prefix
      */
-    protected function getDuration($objTpl, $type, $startDate, $endDate)
+    protected function getDuration(
+        $objTpl, $type, $startDate, $endDate, $prefix = ''
+    )
     {
         global $_ARRAYLANG;
 
@@ -1166,15 +1170,16 @@ JSCODE;
             {
                 $objTpl->setVariable(
                     array(
-                        $this->moduleLangVar.'_ENTRY_DURATION_TYPE' =>
+                        $this->moduleLangVar. $prefix .'_ENTRY_DURATION_TYPE' =>
                             $_ARRAYLANG['TXT_MEDIADIR_DISPLAYDURATION_PERIOD'],
                         $this->moduleLangVar
                             . '_ENTRY_DURATION_START' => $startDate,
-                        'TXT_'.$this->moduleLangVar
+                        'TXT_'.$this->moduleLangVar . $prefix
                             . '_ENTRY_DURATION_DATE_SEPARATOR' => $_ARRAYLANG[
                                 'TXT_MEDIADIR_DURATION_DATE_SEPARATOR'
                             ],
-                        $this->moduleLangVar . '_ENTRY_DURATION_END' => $endDate,
+                        $this->moduleLangVar . $prefix
+                            . '_ENTRY_DURATION_END' => $endDate,
                     )
                 );
             }
@@ -1188,10 +1193,14 @@ JSCODE;
             ) {
                 $objTpl->setVariable(
                     array(
-                        $this->moduleLangVar.'_ENTRY_DURATION_TYPE' =>
-                            $_ARRAYLANG['TXT_MEDIADIR_DISPLAYDURATION_ALWAYS'],
-                        'TXT_'.$this->moduleLangVar .'_ENTRY_DURATION_ALWAYS' =>
-                            $_ARRAYLANG['TXT_MEDIADIR_DURATION_ALWAYS']
+                        $this->moduleLangVar. $prefix
+                            . '_ENTRY_DURATION_TYPE' => $_ARRAYLANG[
+                                'TXT_MEDIADIR_DISPLAYDURATION_ALWAYS'
+                            ],
+                        'TXT_'.$this->moduleLangVar . $prefix
+                            . '_ENTRY_DURATION_ALWAYS' => $_ARRAYLANG[
+                                'TXT_MEDIADIR_DURATION_ALWAYS'
+                            ]
                     )
                 );
             }
