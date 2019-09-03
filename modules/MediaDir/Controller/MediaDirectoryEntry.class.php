@@ -1167,10 +1167,10 @@ JSCODE;
         ) {
             $objTpl->setVariable(
                 array(
-                    $this->moduleLangVar. $prefix .'_ENTRY_DURATION_TYPE' =>
+                    $this->moduleLangVar . $prefix .'_ENTRY_DURATION_TYPE' =>
                         $_ARRAYLANG['TXT_MEDIADIR_DISPLAYDURATION_PERIOD'],
-                    $this->moduleLangVar
-                        . '_ENTRY_DURATION_START' => $startDate,
+                    $this->moduleLangVar . $prefix
+                        .  '_ENTRY_DURATION_START' => $startDate,
                     'TXT_'.$this->moduleLangVar . $prefix
                         . '_ENTRY_DURATION_DATE_SEPARATOR' => $_ARRAYLANG[
                             'TXT_MEDIADIR_DURATION_DATE_SEPARATOR'
