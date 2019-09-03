@@ -1154,7 +1154,7 @@ JSCODE;
      * @param int $endDate end date as unix timestamp
      * @param string $prefix custom prefix
      */
-    protected function getDuration(
+    public function getDuration(
         $objTpl, $type, $startDate, $endDate, $prefix = ''
     ) {
         global $_ARRAYLANG;

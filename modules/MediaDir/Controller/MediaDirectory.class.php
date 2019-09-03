@@ -1422,46 +1422,14 @@ class MediaDirectory extends MediaDirectoryLibrary
                 ));
             }
 
-            if ($arrEntry['entryDurationType'] == 2) {
-                if(
-                    intval(
-                        $objTemplate->blockExists(
-                            $this->moduleNameLC.'EntryDurationTimePeriod'
-                        )
-                    ) != 0)
-                {
-                    $objTemplate->setVariable(
-                        array(
-                            $this->moduleLangVar.'_LATEST_ENTRY_DURATION_TYPE' =>
-                                $_ARRAYLANG['TXT_MEDIADIR_DISPLAYDURATION_PERIOD'],
-                            $this->moduleLangVar
-                            . '_LATEST_ENTRY_DURATION_START' => $arrEntry['entryDurationStart'],
-                            'TXT_'.$this->moduleLangVar
-                            . '_LATEST_ENTRY_DURATION_DATE_SEPARATOR' => $_ARRAYLANG[
-                            'TXT_MEDIADIR_DURATION_DATE_SEPARATOR'
-                            ],
-                            $this->moduleLangVar . '_LATEST_ENTRY_DURATION_END' => $arrEntry['entryDurationEnd'],
-                        )
-                    );
-                }
-            } else {
-                if(
-                    intval(
-                        $objTemplate->blockExists(
-                            $this->moduleNameLC.'EntryDurationAlways'
-                        )
-                    ) != 0
-                ) {
-                    $objTemplate->setVariable(
-                        array(
-                            $this->moduleLangVar.'_LATEST_ENTRY_DURATION_TYPE' =>
-                                $_ARRAYLANG['TXT_MEDIADIR_DISPLAYDURATION_ALWAYS'],
-                            'TXT_'.$this->moduleLangVar .'_LATEST_ENTRY_DURATION_ALWAYS' =>
-                                $_ARRAYLANG['TXT_MEDIADIR_DURATION_ALWAYS']
-                        )
-                    );
-                }
-            }
+            $objEntry->getDuration(
+                $objTemplate,
+                $arrEntry['entryDurationType'],
+                $arrEntry['entryDurationStart'],
+                $arrEntry['entryDurationEnd'],
+                '_LATEST'
+            );
+
 
             $blockId = $arrExistingBlocks[$i];
             $objTemplate->parse($this->moduleNameLC.'Latest_row_'.$blockId);
