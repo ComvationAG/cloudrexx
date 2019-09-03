@@ -1156,54 +1156,44 @@ JSCODE;
      */
     protected function getDuration(
         $objTpl, $type, $startDate, $endDate, $prefix = ''
-    )
-    {
+    ) {
         global $_ARRAYLANG;
 
-        if ($type == 2) {
-            if(
-                intval(
-                    $objTpl->blockExists(
-                        $this->moduleNameLC.'EntryDurationTimePeriod'
-                    )
-                ) != 0)
-            {
-                $objTpl->setVariable(
-                    array(
-                        $this->moduleLangVar. $prefix .'_ENTRY_DURATION_TYPE' =>
-                            $_ARRAYLANG['TXT_MEDIADIR_DISPLAYDURATION_PERIOD'],
-                        $this->moduleLangVar
-                            . '_ENTRY_DURATION_START' => $startDate,
-                        'TXT_'.$this->moduleLangVar . $prefix
-                            . '_ENTRY_DURATION_DATE_SEPARATOR' => $_ARRAYLANG[
-                                'TXT_MEDIADIR_DURATION_DATE_SEPARATOR'
-                            ],
-                        $this->moduleLangVar . $prefix
-                            . '_ENTRY_DURATION_END' => $endDate,
-                    )
-                );
-            }
-        } else {
-            if(
-                intval(
-                    $objTpl->blockExists(
-                        $this->moduleNameLC.'EntryDurationAlways'
-                    )
-                ) != 0
-            ) {
-                $objTpl->setVariable(
-                    array(
-                        $this->moduleLangVar. $prefix
-                            . '_ENTRY_DURATION_TYPE' => $_ARRAYLANG[
-                                'TXT_MEDIADIR_DISPLAYDURATION_ALWAYS'
-                            ],
-                        'TXT_'.$this->moduleLangVar . $prefix
-                            . '_ENTRY_DURATION_ALWAYS' => $_ARRAYLANG[
-                                'TXT_MEDIADIR_DURATION_ALWAYS'
-                            ]
-                    )
-                );
-            }
+        if (
+            $type == 2 &&
+            $objTpl->blockExists(
+                $this->moduleNameLC.'EntryDurationTimePeriod'
+            )
+        ) {
+            $objTpl->setVariable(
+                array(
+                    $this->moduleLangVar. $prefix .'_ENTRY_DURATION_TYPE' =>
+                        $_ARRAYLANG['TXT_MEDIADIR_DISPLAYDURATION_PERIOD'],
+                    $this->moduleLangVar
+                        . '_ENTRY_DURATION_START' => $startDate,
+                    'TXT_'.$this->moduleLangVar . $prefix
+                        . '_ENTRY_DURATION_DATE_SEPARATOR' => $_ARRAYLANG[
+                            'TXT_MEDIADIR_DURATION_DATE_SEPARATOR'
+                        ],
+                    $this->moduleLangVar . $prefix
+                        . '_ENTRY_DURATION_END' => $endDate,
+                )
+            );
+        } else if (
+            $objTpl->blockExists($this->moduleNameLC.'EntryDurationAlways')
+        ) {
+            $objTpl->setVariable(
+                array(
+                    $this->moduleLangVar. $prefix
+                        . '_ENTRY_DURATION_TYPE' => $_ARRAYLANG[
+                            'TXT_MEDIADIR_DISPLAYDURATION_ALWAYS'
+                        ],
+                    'TXT_'.$this->moduleLangVar . $prefix
+                        . '_ENTRY_DURATION_ALWAYS' => $_ARRAYLANG[
+                            'TXT_MEDIADIR_DURATION_ALWAYS'
+                        ]
+                )
+            );
         }
     }
 
