@@ -1159,6 +1159,7 @@ JSCODE;
     ) {
         global $_ARRAYLANG;
 
+        // duration type 2 means that the entry has a time limit
         if (
             $type == 2 &&
             $objTpl->blockExists(
