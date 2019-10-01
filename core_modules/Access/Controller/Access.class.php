@@ -545,7 +545,7 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
 
             if (isset($_POST['access_profile_attribute']) && is_array($_POST['access_profile_attribute'])) {
                 // fetch current profile data
-                $arrOriginalProfileData = $this->fetchProfileDataOfUser($objFWUser->objUser);
+                $arrOriginalProfileData = $this->fetchProfileDataOfUser($user);
 
                 // profile modifications to be stored
                 $arrProfile = $_POST['access_profile_attribute'];
@@ -576,7 +576,7 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
                     && $user->store()
                 ) {
                     // fetch new profile data
-                    $arrNewProfileData = $this->fetchProfileDataOfUser($objFWUser->objUser);
+                    $arrNewProfileData = $this->fetchProfileDataOfUser($user);
 
                     // identify changed attributes
                     $profileDiff = array();
@@ -589,7 +589,7 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
                     }
 
                     // send notification mail regarding modified user profile
-                    $this->sendProfileChangeNotificationMail($objFWUser->objUser, $profileDiff, $arrOriginalProfileData, $arrNewProfileData);
+                    $this->sendProfileChangeNotificationMail($user, $profileDiff, $arrOriginalProfileData, $arrNewProfileData);
 
                     $msg = $_ARRAYLANG['TXT_ACCESS_USER_ACCOUNT_STORED_SUCCESSFULLY'];
                     $settingsDone = true;
@@ -617,7 +617,7 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
         $this->parseAccountAttributes($user, true);
         $this->parseNewsletterLists($user);
 
-        $objFWUser->objUser->objAttribute->first();
+        $user->objAttribute->first();
         while (!$user->objAttribute->EOF) {
             $objAttribute = $user->objAttribute->getById($user->objAttribute->getId());
 
