@@ -473,7 +473,7 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
     {
         global $_CONFIG, $_ARRAYLANG;
 
-        if(!is_a($user, '\User')){
+        if (is_null($user)) {
             $objFWUser = \FWUser::getFWUserObject();
             $user = $objFWUser->objUser;
             if (!$user->login()) {
