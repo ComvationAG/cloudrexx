@@ -1976,7 +1976,7 @@ class User extends User_Profile
 
         if ($this->id) {
             // update existing account
-            try{
+            try {
                 // To show a custom error message on preUpdate, you can throw a
                 // ShinyException and put the error in the exception message
                 \Env::get('cx')->getEvents()->triggerEvent(
@@ -1998,7 +1998,7 @@ class User extends User_Profile
                 $generatedPassword = $this->make_password();
                 $this->setPassword($generatedPassword);
             }
-            try{
+            try {
                 // To show a custom error message on prePersist, you can throw a
                 // ShinyException and put the error in the exception message
                 \Env::get('cx')->getEvents()->triggerEvent(
