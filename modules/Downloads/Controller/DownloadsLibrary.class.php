@@ -83,6 +83,7 @@ class DownloadsLibrary
         'updated_file_time_limit'       => 604800,
         'associate_user_to_groups'      => '',
         'list_downloads_current_lang'   => 1,
+        'list_downloads_extension_icon' => 0,
         'integrate_into_search_component'=> 1,
         'auto_file_naming'     => 'off',
         'pretty_regex_pattern' => '',
