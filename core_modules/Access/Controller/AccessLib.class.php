@@ -465,6 +465,17 @@ class AccessLib
             break;
         }
 
+        if (
+            $objAttribute->isMandatory() &&
+            $this->_objTpl->blockExists(
+                $this->attributeNamePrefix.'_'.$attributeId.'_field_required'
+            )
+        ) {
+            $this->_objTpl->touchBlock(
+                $this->attributeNamePrefix.'_'.$attributeId.'_field_required'
+            );
+        }
+
         if (!$edit && isset($arrPlaceholders['_VALUE']) && $arrPlaceholders['_VALUE'] == '') {
             return false;
         }
@@ -729,6 +740,15 @@ class AccessLib
             $placeholderUC.'_NAME'    => $accountAttributePrefix.$attributeId,
             $placeholderUC.'_ID'        => $accountAttributePrefix.$attributeId
         );
+
+        if ($this->_objTpl->blockExists(
+            $accountAttributePrefix.$attributeId.'_field_required'
+        )
+        ) {
+            $this->_objTpl->touchBlock(
+                $accountAttributePrefix.$attributeId.'_field_required'
+            );
+        }
 
         $arrSettings = \User_Setting::getSettings();
         if (!$arrSettings['use_usernames']['status'] && $attributeId == 'username') {
