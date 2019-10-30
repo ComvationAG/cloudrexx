@@ -1463,6 +1463,29 @@ class Download {
         return $arrIds;
     }
 
+    /**
+     * Select all protected downloads, if downloads were found return true
+     *
+     * @param array $filter To filter downloads
+     * @param string $searchTerm The keyword to search by
+     * @return bool if protected downloads exist
+     */
+    public function hasProtectedDownloads($filter, $searchTerm)
+    {
+        if ($this->loadDownloads(
+            $filter,
+            $searchTerm,
+            null,
+            null,
+            null,
+            null,
+            $this->config['list_downloads_current_lang']
+        )) {
+            return true;
+        }
+
+        return false;
+    }
 
     public function incrementDownloadCount()
     {

@@ -292,11 +292,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
     /**
      * Select all protected downloads, if downloads were found return true
+     * Filtered by a searchterm
      *
-     * @param $searchTerm $searchTerm The keyword to search by
+     * @param string $searchTerm The keyword to search by
      * @return bool if protected downloads exist
      */
-    public function hasProtectedDownloads($searchTerm)
+    public function hasProtectedDownloadsForSearch($searchTerm)
     {
         $downloadLibrary = new DownloadsLibrary();
         $config = $downloadLibrary->getSettings();
@@ -321,19 +322,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             return false;
         }
 
-        if ($download->loadDownloads(
-            $filter,
-            $searchTerm,
-            null,
-            null,
-            null,
-            null,
-            $config['list_downloads_current_lang']
-        )) {
-            return true;
-        }
-
-        return false;
+        return $download->hasProtectedDownloads($filter, $searchTerm);
     }
 
     /**

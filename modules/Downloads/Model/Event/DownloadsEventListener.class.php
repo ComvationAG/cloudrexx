@@ -62,7 +62,7 @@ class DownloadsEventListener extends DefaultEventListener
         );
         $search->appendResult($result);
         $search->setHasProtectedResult(
-            $this->getComponent('Downloads')->hasProtectedDownloads(
+            $this->getComponent('Downloads')->hasProtectedDownloadsForSearch(
                 $search->getTerm()
             )
         );
