@@ -61,6 +61,11 @@ class DownloadsEventListener extends DefaultEventListener
             )
         );
         $search->appendResult($result);
+        $search->setHasProtectedResult(
+            $this->getComponent('Downloads')->hasProtectedDownloads(
+                $search->getTerm()
+            )
+        );
     }
 
     public function mediasourceLoad(
