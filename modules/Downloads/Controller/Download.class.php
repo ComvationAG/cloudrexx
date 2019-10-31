@@ -1468,10 +1468,13 @@ class Download {
      *
      * @param array $filter To filter downloads
      * @param string $searchTerm The keyword to search by
+     * @param bool $includeDownloadsOfSubcategories if true list also downloads
+     *                                              of subcategories
      * @return bool if protected downloads exist
      */
-    public function hasProtectedDownloads($filter, $searchTerm)
-    {
+    public function hasProtectedDownloads(
+        $filter, $searchTerm, $includeDownloadsOfSubcategories = false
+    ) {
         if ($this->loadDownloads(
             $filter,
             $searchTerm,
@@ -1479,6 +1482,7 @@ class Download {
             null,
             null,
             null,
+            $includeDownloadsOfSubcategories,
             $this->config['list_downloads_current_lang']
         )) {
             return true;
