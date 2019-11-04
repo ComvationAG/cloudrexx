@@ -1694,7 +1694,7 @@ class DownloadsManager extends DownloadsLibrary
             }
         }
 
-        $twinSelect = new \Cx\Core\Html\Model\Entity\TwinSelect(
+        $twinSelectCategories = new \Cx\Core\Html\Model\Entity\TwinSelect(
             'categories',
             'downloads_download_associated_categories',
             $_ARRAYLANG['TXT_DOWNLOADS_ASSIGNED_CATEGORIES'],
@@ -1706,7 +1706,7 @@ class DownloadsManager extends DownloadsLibrary
         );
 
         $this->objTemplate->setVariable(array(
-            'DOWNLOADS_DOWNLOAD_TWINSELECT' => $twinSelect->render(),
+            'DOWNLOADS_DOWNLOAD_CATEGORIES_TWINSELECT' => $twinSelectCategories->render(),
         ));
 
         // parse related downloads
