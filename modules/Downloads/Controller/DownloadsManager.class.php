@@ -1656,6 +1656,8 @@ class DownloadsManager extends DownloadsLibrary
         // parse associated categories
         $arrCategories = $this->getParsedCategoryListForDownloadAssociation();
         $arrAssociatedCategories = $objDownload->getAssociatedCategoryIds();
+        $associatedCategories = array();
+        $notAssociatedCategories = array();
         $length = count($arrCategories);
         for ($i = 0; $i < $length; $i++) {
             if (// managers are allowed to change the category association
@@ -1681,21 +1683,30 @@ class DownloadsManager extends DownloadsLibrary
             } else {
                 $disabled = true;
             }
-            $option = '<option value="'.$arrCategories[$i]['id'].'"'.($disabled ? ' disabled="disabled"' : '').'>'.htmlentities($arrCategories[$i]['name'], ENT_QUOTES, CONTREXX_CHARSET).'</option>';
 
             if (   in_array($arrCategories[$i]['id'], $arrAssociatedCategories)
                    // automatically assign a new download to the currently viewed category
                 || (!$objDownload->getId() && $arrCategories[$i]['id'] == $this->parentCategoryId)
             ) {
-                $arrAssociatedCategoryOptions[] = $option;
+                $associatedCategories[$arrCategories[$i]['id']] = $arrCategories[$i]['name'];
             } else {
-                $arrNotAssociatedCategoryOptions[] = $option;
+                $notAssociatedCategories[$arrCategories[$i]['id']] = $arrCategories[$i]['name'];
             }
         }
 
+        $twinSelect = new \Cx\Core\Html\Model\Entity\TwinSelect(
+            'categories',
+            'downloads_download_associated_categories',
+            $_ARRAYLANG['TXT_DOWNLOADS_ASSIGNED_CATEGORIES'],
+            $associatedCategories,
+            'downloads_download_not_associated_categories',
+            $_ARRAYLANG['TXT_DOWNLOADS_AVAILABLE_CATEGORIES'],
+            $notAssociatedCategories,
+            'downloads_download_form'
+        );
+
         $this->objTemplate->setVariable(array(
-            'DOWNLOADS_DOWNLOAD_ASSOCIATED_CATEGORIES'  => implode("\n", $arrAssociatedCategoryOptions),
-            'DOWNLOADS_DOWNLOAD_NOT_ASSOCIATED_CATEGORIES'  => implode("\n", $arrNotAssociatedCategoryOptions)
+            'DOWNLOADS_DOWNLOAD_TWINSELECT' => $twinSelect->render(),
         ));
 
         // parse related downloads
