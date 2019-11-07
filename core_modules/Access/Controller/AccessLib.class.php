@@ -746,9 +746,10 @@ class AccessLib
             $placeholderUC.'_ID'        => $accountAttributePrefix.$attributeId
         );
 
-        if ($this->_objTpl->blockExists(
-            $accountAttributePrefix.$attributeId.'_field_required'
-        )
+        if (
+            $this->_objTpl->blockExists(
+                $accountAttributePrefix.$attributeId.'_field_required'
+            )
         ) {
             $this->_objTpl->touchBlock(
                 $accountAttributePrefix.$attributeId.'_field_required'
