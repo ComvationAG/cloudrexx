@@ -466,14 +466,19 @@ class AccessLib
         }
 
         if (
-            $objAttribute->isMandatory() &&
             $this->_objTpl->blockExists(
                 $this->attributeNamePrefix.'_'.$attributeId.'_field_required'
             )
         ) {
-            $this->_objTpl->touchBlock(
-                $this->attributeNamePrefix.'_'.$attributeId.'_field_required'
-            );
+            if ($objAttribute->isMandatory()) {
+                $this->_objTpl->touchBlock(
+                    $this->attributeNamePrefix.'_'.$attributeId.'_field_required'
+                );
+            } else {
+                $this->_objTpl->hideBlock(
+                    $this->attributeNamePrefix.'_'.$attributeId.'_field_required'
+                );
+            }
         }
 
         if (!$edit && isset($arrPlaceholders['_VALUE']) && $arrPlaceholders['_VALUE'] == '') {
