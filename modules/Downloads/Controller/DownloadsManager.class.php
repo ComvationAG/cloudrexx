@@ -885,6 +885,27 @@ class DownloadsManager extends DownloadsLibrary
             'DOWNLOADS_CATEGORY_APPLY_RECURSIVE_CHECKED' => $objCategory->hasToSetPermissionsRecursive() ? 'checked="checked"' : '',
             'DOWNLOADS_MEDIA_BROWSER_BUTTON'             => self::getMediaBrowserButton(null, 'filebrowser')
         ));
+
+        if (
+            !$objCategory->getId() &&
+            $this->objTemplate->blockExists(
+                'downloads_category_take_over_parent_permissions'
+            )
+        ) {
+            $this->objTemplate->setVariable(array(
+                'TXT_DOWNLOADS_CATEGORY_TAKE_OVER_PARENT_PERMISSION' => $_ARRAYLANG[
+                    'TXT_DOWNLOADS_CATEGORY_TAKE_OVER_PARENT_PERMISSION'
+                ]
+            ));
+            $this->objTemplate->touchBlock(
+                'downloads_category_take_over_parent_permissions'
+            );
+        } else {
+            $this->objTemplate->hideBlock(
+                'downloads_category_take_over_parent_permissions'
+            );
+        }
+
         return true;
     }
 
