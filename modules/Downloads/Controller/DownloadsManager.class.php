@@ -1109,9 +1109,16 @@ class DownloadsManager extends DownloadsLibrary
                 || \Permission::checkAccess(143, 'static', true)
             ) {
                 // parse download function
+
+                if (!empty($this->getSettings()['load_download_file_icon'])) {
+                    $icon = $objDownload->getFileIcon();
+                } else {
+                    $icon = $objDownload->getIcon(true);
+                }
+
                 $this->objTemplate->setVariable(array(
                     'DOWNLOADS_DOWNLOAD_ID'                 => $objDownload->getId(),
-                    'DOWNLOADS_DOWNLOAD_DOWNLOAD_ICON'      => $objDownload->getIcon(true),
+                    'DOWNLOADS_DOWNLOAD_DOWNLOAD_ICON'      => $icon,
                     'DOWNLOADS_DOWNLOAD_SOURCE'             => htmlentities($objDownload->getSource(), ENT_QUOTES, CONTREXX_CHARSET)
                 ));
 
@@ -2740,7 +2747,7 @@ class DownloadsManager extends DownloadsLibrary
             $this->arrConfig['use_attr_author']             = !empty($_POST['downloads_settings_attribute_author']) ? intval($_POST['downloads_settings_attribute_author']) : 0;
             $this->arrConfig['use_attr_website']            = !empty($_POST['downloads_settings_attribute_website']) ? intval($_POST['downloads_settings_attribute_website']) : 0;
             $this->arrConfig['list_downloads_current_lang'] = !empty($_POST['downloads_settings_list_downloads_current_lang']) ? contrexx_input2int($_POST['downloads_settings_list_downloads_current_lang']) : 0;
-            $this->arrConfig['list_downloads_extension_icon'] = !empty($_POST['downloads_settings_list_downloads_extension_icon']) ? contrexx_input2int($_POST['downloads_settings_list_downloads_extension_icon']) : 0;
+            $this->arrConfig['load_download_file_icon'] = !empty($_POST['downloads_settings_load_download_file_icon']) ? contrexx_input2int($_POST['downloads_settings_load_download_file_icon']) : 0;
             $this->arrConfig['integrate_into_search_component'] = !empty($_POST['downloads_settings_integrate_into_search_component']) ? contrexx_input2int($_POST['downloads_settings_integrate_into_search_component']) : 0;
 
             if (
@@ -2889,8 +2896,8 @@ class DownloadsManager extends DownloadsLibrary
             'TXT_DOWNLOADS_SETTINGS_ALPHABETIC_LABEL'       => $_ARRAYLANG['TXT_DOWNLOADS_SETTINGS_ALPHABETIC_LABEL'],
             'TXT_DOWNLOADS_LIST_DOWNLOADS_CURRENT_LANG'     => $_ARRAYLANG['TXT_DOWNLOADS_LIST_DOWNLOADS_CURRENT_LANG'],
             'TXT_DOWNLOADS_LIST_DOWNLOADS_CURRENT_LANG_DESC'=> $_ARRAYLANG['TXT_DOWNLOADS_LIST_DOWNLOADS_CURRENT_LANG_DESC'],
-            'TXT_DOWNLOADS_LIST_DOWNLOADS_EXTENSION_FILE' => $_ARRAYLANG['TXT_DOWNLOADS_LIST_DOWNLOADS_EXTENSION_FILE'],
-            'TXT_DOWNLOADS_LIST_DOWNLOADS_EXTENSION_FILE_DESC' => $_ARRAYLANG['TXT_DOWNLOADS_LIST_DOWNLOADS_EXTENSION_FILE_DESC'],
+            'TXT_DOWNLOADS_LOAD_DOWNLOAD_FILE_ICON'         => $_ARRAYLANG['TXT_DOWNLOADS_LOAD_DOWNLOAD_FILE_ICON'],
+            'TXT_DOWNLOADS_LOAD_DOWNLOAD_FILE_ICON_DESC'    => $_ARRAYLANG['TXT_DOWNLOADS_LOAD_DOWNLOAD_FILE_ICON_DESC'],
             'DOWNLOADS_SETTINGS_COL_COUNT'                  => $this->arrConfig['overview_cols_count'],
             'DOWNLOADS_SETTINGS_SUBCAT_COUNT'               => $this->arrConfig['overview_max_subcats'],
             'DOWNLOADS_SETTINGS_ATTRIBUTE_METAKEYS_CHECKED' => $this->arrConfig['use_attr_metakeys'] ? 'checked="checked"' : '',
@@ -2900,7 +2907,7 @@ class DownloadsManager extends DownloadsLibrary
             'DOWNLOADS_SETTINGS_ATTRIBUTE_AUTHOR_CHECKED'   => $this->arrConfig['use_attr_author'] ? 'checked="checked"' : '',
             'DOWNLOADS_SETTINGS_ATTRIBUTE_WEBSITE_CHECKED'  => $this->arrConfig['use_attr_website'] ? 'checked="checked"' : '',
             'DOWNLOADS_SETTINGS_LIST_DOWNLOADS_CURRENT_LANG'=> $this->arrConfig['list_downloads_current_lang'] ? 'checked="checked"' : '',
-            'DOWNLOADS_SETTINGS_LIST_DOWNLOADS_EXTENSION_ICON'=> $this->arrConfig['list_downloads_extension_icon'] ? 'checked="checked"' : '',
+            'DOWNLOADS_SETTINGS_LOAD_DOWNLOAD_FILE_ICON'    => $this->arrConfig['load_download_file_icon'] ? 'checked="checked"' : '',
             'DOWNLOADS_SETTINGS_INTEGRATE_INTO_SEARCH_COMPONENT'=> $this->arrConfig['integrate_into_search_component'] ? 'checked="checked"' : '',
             'DOWNLOADS_SETTINGS_AUTO_NAMING_DISABLE_CHECKED' => $this->arrConfig['auto_file_naming'] == 'off' ? 'checked="checked"' : '',
             'DOWNLOADS_SETTINGS_AUTO_NAMING_ENABLE_CHECKED' => $this->arrConfig['auto_file_naming'] == 'on' ? 'checked="checked"' : '',
