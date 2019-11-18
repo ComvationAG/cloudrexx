@@ -690,8 +690,10 @@ class DownloadsManager extends DownloadsLibrary
                 $arrCategoryPermissions[$protectionType]['groups'] = !empty($_POST['downloads_category_'.$protectionType.'_associated_groups']) ? array_map('intval', $_POST['downloads_category_'.$protectionType.'_associated_groups']) : array();
             }
 
-            $objCategory->setPermissionsRecursive(!empty($_POST['downloads_category_apply_recursive']));
-            $objCategory->setPermissions($arrCategoryPermissions);
+            if (\Permission::checkAccess(205, 'static', true)) {
+                $objCategory->setPermissionsRecursive(!empty($_POST['downloads_category_apply_recursive']));
+                $objCategory->setPermissions($arrCategoryPermissions);
+            }
 
             if ($status && $objCategory->store()) {
                 $this->parentCategoryId = $objCategory->getParentId();
@@ -855,11 +857,18 @@ class DownloadsManager extends DownloadsLibrary
         ));
 
         // parse access permissions
+        if (!\Permission::checkAccess(205, 'static', true)) {
+            $this->objTemplate->hideBlock('downloads_category_permissions');
+            $this->objTemplate->hideBlock('downloads_category_permissions_tab');
+
+            return true;
+        }
+
         $arrPermissions = $objCategory->getPermissions();
 
         $objGroup = $objFWUser->objGroup->getGroups();
         while (!$objGroup->EOF) {
-            $option = '<option value="'.$objGroup->getId().'">'.htmlentities($objGroup->getName(), ENT_QUOTES, CONTREXX_CHARSET).' ['.$objGroup->getType().']</option>';
+            $option = '<option value="' . $objGroup->getId() . '">' . htmlentities($objGroup->getName(), ENT_QUOTES, CONTREXX_CHARSET) . ' [' . $objGroup->getType() . ']</option>';
 
             foreach ($this->arrPermissionTypes as $permissionType) {
                 if (in_array($objGroup->getId(), $arrPermissions[$permissionType]['groups'])) {
@@ -874,17 +883,20 @@ class DownloadsManager extends DownloadsLibrary
         foreach ($arrPermissions as $permissionType => $arrPermissionType) {
             $permissionTypeUC = strtoupper($permissionType);
             $this->objTemplate->setVariable(array(
-                'DOWNLOADS_CATEGORY_'.$permissionTypeUC.'_ALL_CHECKED'              => !$arrPermissionType['protected'] ? 'checked="checked"' : '',
-                'DOWNLOADS_CATEGORY_'.$permissionTypeUC.'_SELECTED_CHECKED'         => $arrPermissionType['protected'] ? 'checked="checked"' : '',
-                'DOWNLOADS_CATEGORY_'.$permissionTypeUC.'_DISPLAY'                  => $arrPermissionType['protected'] ? '' : 'none',
-                'DOWNLOADS_CATEGORY_'.$permissionTypeUC.'_NOT_ASSOCIATED_GROUPS'    => implode("\n", $arrPermissionType['not_associated_groups']),
-                'DOWNLOADS_CATEGORY_'.$permissionTypeUC.'_ASSOCIATED_GROUPS'        => implode("\n", $arrPermissionType['associated_groups'])
+                'DOWNLOADS_CATEGORY_' . $permissionTypeUC . '_ALL_CHECKED' => !$arrPermissionType['protected'] ? 'checked="checked"' : '',
+                'DOWNLOADS_CATEGORY_' . $permissionTypeUC . '_SELECTED_CHECKED' => $arrPermissionType['protected'] ? 'checked="checked"' : '',
+                'DOWNLOADS_CATEGORY_' . $permissionTypeUC . '_DISPLAY' => $arrPermissionType['protected'] ? '' : 'none',
+                'DOWNLOADS_CATEGORY_' . $permissionTypeUC . '_NOT_ASSOCIATED_GROUPS' => implode("\n", $arrPermissionType['not_associated_groups']),
+                'DOWNLOADS_CATEGORY_' . $permissionTypeUC . '_ASSOCIATED_GROUPS' => implode("\n", $arrPermissionType['associated_groups'])
             ));
         }
         $this->objTemplate->setVariable(array(
             'DOWNLOADS_CATEGORY_APPLY_RECURSIVE_CHECKED' => $objCategory->hasToSetPermissionsRecursive() ? 'checked="checked"' : '',
-            'DOWNLOADS_MEDIA_BROWSER_BUTTON'             => self::getMediaBrowserButton(null, 'filebrowser')
+            'DOWNLOADS_MEDIA_BROWSER_BUTTON' => self::getMediaBrowserButton(null, 'filebrowser')
         ));
+        $this->objTemplate->touchBlock('downloads_category_permissions');
+        $this->objTemplate->touchBlock('downloads_category_permissions_tab');
+
         return true;
     }
 
