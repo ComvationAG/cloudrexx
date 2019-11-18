@@ -1419,14 +1419,16 @@ class DownloadsManager extends DownloadsLibrary
             $this->arrConfig['use_attr_website'] ? $objDownload->setWebsite(isset($_POST['downloads_download_website']) ? contrexx_stripslashes($_POST['downloads_download_website']) : '') : null;
             $objDownload->setImage(isset($_POST['downloads_download_image']) ? contrexx_stripslashes($_POST['downloads_download_image']) : '');
             $objDownload->setValidityTimePeriod(!empty($_POST['downloads_download_validity']) ? intval($_POST['downloads_download_validity']) : 0);
-            $objDownload->setVisibility(!empty($_POST['downloads_download_visibility']));
-            $objDownload->setProtection(!empty($_POST['downloads_download_access']));
-            $objDownload->setGroups(
-                   $objDownload->getProtection()
-                && !empty($_POST['downloads_download_access_associated_groups'])
-                      ? array_map('intval', $_POST['downloads_download_access_associated_groups'])
-                      : array()
-            );
+            if (\Permission::checkAccess(205, 'static', true)) {
+                $objDownload->setVisibility(!empty($_POST['downloads_download_visibility']));
+                $objDownload->setProtection(!empty($_POST['downloads_download_access']));
+                $objDownload->setGroups(
+                    $objDownload->getProtection()
+                    && !empty($_POST['downloads_download_access_associated_groups'])
+                        ? array_map('intval', $_POST['downloads_download_access_associated_groups'])
+                        : array()
+                );
+            }
             $objDownload->setCategories(!empty($_POST['downloads_download_associated_categories']) ? array_map('intval', $_POST['downloads_download_associated_categories']) : array(0));
             $objDownload->setDownloads(!empty($_POST['downloads_download_associated_downloads']) ? array_map('intval', $_POST['downloads_download_associated_downloads']) : array());
 
@@ -1738,55 +1740,62 @@ class DownloadsManager extends DownloadsLibrary
         ));
 
         // parse access permissions
-        if ($objDownload->getAccessId()) {
-            $objGroup = $objFWUser->objGroup->getGroups(
-                array('dynamic' => $objDownload->getAccessId())
-            );
-            $arrAssociatedGroups = $objGroup->getLoadedGroupIds();
-        } elseif ($objDownload->getProtection()) {
-            $arrAssociatedGroups = $objDownload->getAccessGroupIds();
+        if (!\Permission::checkAccess(205, 'static', true)) {
+            $this->objTemplate->hideBlock('downloads_download_permissions');
+            $this->objTemplate->hideBlock('downloads_download_permissions_tab');
         } else {
-            //$arrAssociatedCategories = $objDownload->getAssociatedCategoryIds();
-            if (count($arrAssociatedCategories)) {
-                $objCategory = Category::getCategories(
-                    array('id' => $arrAssociatedCategories), null, null,
-                    array('id', 'read_access_id')
+            if ($objDownload->getAccessId()) {
+                $objGroup = $objFWUser->objGroup->getGroups(
+                    array('dynamic' => $objDownload->getAccessId())
                 );
-                while (!$objCategory->EOF) {
-                    if ($objCategory->getReadAccessId()) {
-                        $objGroup = $objFWUser->objGroup->getGroups(array('dynamic' => $objCategory->getReadAccessId()));
-                        $arrAssociatedGroups = array_merge($arrAssociatedGroups, $objGroup->getLoadedGroupIds());
-                    }
-                    $objCategory->next();
-                }
-            } else {
-                // TODO: WHY THAT?
-                $objGroup = $objFWUser->objGroup->getGroups();
                 $arrAssociatedGroups = $objGroup->getLoadedGroupIds();
-            }
-        }
-
-        $objGroup = $objFWUser->objGroup->getGroups();
-        while (!$objGroup->EOF) {
-            $option = '<option value="'.$objGroup->getId().'">'.htmlentities($objGroup->getName(), ENT_QUOTES, CONTREXX_CHARSET).' ['.$objGroup->getType().']</option>';
-
-            if (/*$objDownload->getProtection() || */in_array($objGroup->getId(), $arrAssociatedGroups)) {
-                $arrAssociatedGroupOptions[] = $option;
+            } elseif ($objDownload->getProtection()) {
+                $arrAssociatedGroups = $objDownload->getAccessGroupIds();
             } else {
-                $arrNotAssociatedGroupOptions[] = $option;
+                //$arrAssociatedCategories = $objDownload->getAssociatedCategoryIds();
+                if (count($arrAssociatedCategories)) {
+                    $objCategory = Category::getCategories(
+                        array('id' => $arrAssociatedCategories), null, null,
+                        array('id', 'read_access_id')
+                    );
+                    while (!$objCategory->EOF) {
+                        if ($objCategory->getReadAccessId()) {
+                            $objGroup = $objFWUser->objGroup->getGroups(array('dynamic' => $objCategory->getReadAccessId()));
+                            $arrAssociatedGroups = array_merge($arrAssociatedGroups, $objGroup->getLoadedGroupIds());
+                        }
+                        $objCategory->next();
+                    }
+                } else {
+                    // TODO: WHY THAT?
+                    $objGroup = $objFWUser->objGroup->getGroups();
+                    $arrAssociatedGroups = $objGroup->getLoadedGroupIds();
+                }
             }
 
-            $objGroup->next();
-        }
+            $objGroup = $objFWUser->objGroup->getGroups();
+            while (!$objGroup->EOF) {
+                $option = '<option value="'.$objGroup->getId().'">'.htmlentities($objGroup->getName(), ENT_QUOTES, CONTREXX_CHARSET).' ['.$objGroup->getType().']</option>';
 
-        $this->objTemplate->setVariable(array(
-            'DOWNLOADS_DOWNLOAD_ACCESS_ALL_CHECKED'              => !$objDownload->getProtection() ? 'checked="checked"' : '',
-            'DOWNLOADS_DOWNLOAD_ACCESS_SELECTED_CHECKED'         => $objDownload->getProtection() ? 'checked="checked"' : '',
-            'DOWNLOADS_DOWNLOAD_ACCESS_DISPLAY'                  => $objDownload->getProtection() ? '' : 'none',
-            'DOWNLOADS_DOWNLOAD_ACCESS_ASSOCIATED_GROUPS'        => implode("\n", $arrAssociatedGroupOptions),
-            'DOWNLOADS_DOWNLOAD_ACCESS_NOT_ASSOCIATED_GROUPS'    => implode("\n", $arrNotAssociatedGroupOptions),
-            'DOWNLOADS_DOWNLOAD_VISIBILITY_CHECKED'              => $objDownload->getVisibility() ? 'checked="checked"' : ''
-        ));
+                if (/*$objDownload->getProtection() || */in_array($objGroup->getId(), $arrAssociatedGroups)) {
+                    $arrAssociatedGroupOptions[] = $option;
+                } else {
+                    $arrNotAssociatedGroupOptions[] = $option;
+                }
+
+                $objGroup->next();
+            }
+
+            $this->objTemplate->setVariable(array(
+                'DOWNLOADS_DOWNLOAD_ACCESS_ALL_CHECKED'              => !$objDownload->getProtection() ? 'checked="checked"' : '',
+                'DOWNLOADS_DOWNLOAD_ACCESS_SELECTED_CHECKED'         => $objDownload->getProtection() ? 'checked="checked"' : '',
+                'DOWNLOADS_DOWNLOAD_ACCESS_DISPLAY'                  => $objDownload->getProtection() ? '' : 'none',
+                'DOWNLOADS_DOWNLOAD_ACCESS_ASSOCIATED_GROUPS'        => implode("\n", $arrAssociatedGroupOptions),
+                'DOWNLOADS_DOWNLOAD_ACCESS_NOT_ASSOCIATED_GROUPS'    => implode("\n", $arrNotAssociatedGroupOptions),
+                'DOWNLOADS_DOWNLOAD_VISIBILITY_CHECKED'              => $objDownload->getVisibility() ? 'checked="checked"' : ''
+            ));
+            $this->objTemplate->touchBlock('downloads_download_permissions');
+            $this->objTemplate->touchBlock('downloads_download_permissions_tab');
+        }
 
         // parse cancel link
         $this->objTemplate->setVariable(array(
