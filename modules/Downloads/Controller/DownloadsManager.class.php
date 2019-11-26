@@ -1527,29 +1527,40 @@ class DownloadsManager extends DownloadsLibrary
 
         $succeded = true;
         $objFWUser = \FWUser::getFWUserObject();
-        $objDownload = new \Cx\Modules\Downloads\Controller\Download($this->arrConfig);
+        $objDownload = new \Cx\Modules\Downloads\Controller\Download(
+            $this->arrConfig
+        );
         foreach ($arrDownloadIds as $downloadId) {
             $download = $objDownload->getDownload($downloadId);
 
-            if ($download && $download->getId()
-                && !\Permission::checkAccess(143, 'static', true)
-                && (($objFWUser = \FWUser::getFWUserObject()) == false || !$objFWUser->objUser->login() || $download->getOwnerId() != $objFWUser->objUser->getId())
+            if ($download && $download->getId() &&
+                !\Permission::checkAccess(143, 'static', true) &&
+                (
+                    ($objFWUser = \FWUser::getFWUserObject()) == false ||
+                    !$objFWUser->objUser->login() ||
+                    $download->getOwnerId() != $objFWUser->objUser->getId()
+                )
             ) {
                 continue;
             }
             if (!$overwrite) {
-                $arrCategories = array_merge($arrCategories,$download->getAssociatedCategoryIds());
+                $arrCategories = array_merge(
+                    $arrCategories,
+                    $download->getAssociatedCategoryIds()
+                );
             }
 
             $validCategoryIds = array();
             foreach($arrCategories as $catId) {
                 $objCategory = \Cx\Modules\Downloads\Controller\Category::getCategory($catId);
                 if (
-                    !\Permission::checkAccess(143, 'static', true)
-                    && $objCategory
-                    && $objCategory->getManageFilesAccessId()
-                    && !\Permission::checkAccess($objCategory->getManageFilesAccessId(), 'dynamic', true)
-                    && $objCategory->getOwnerId() != $objFWUser->objUser->getId()
+                    !\Permission::checkAccess(143, 'static', true) &&
+                    $objCategory &&
+                    $objCategory->getManageFilesAccessId() &&
+                    !\Permission::checkAccess(
+                        $objCategory->getManageFilesAccessId(), 'dynamic', true
+                    ) &&
+                    $objCategory->getOwnerId() != $objFWUser->objUser->getId()
                 ) {
                     continue;
                 }
@@ -1559,12 +1570,17 @@ class DownloadsManager extends DownloadsLibrary
             $download->setCategories($validCategoryIds);
             if (!$download->store(null, array())) {
                 $succeded = false;
-                $this->arrStatusMsg['error'] = array_merge($this->arrStatusMsg['error'], $download->getErrorMsg());
+                $this->arrStatusMsg['error'] = array_merge(
+                    $this->arrStatusMsg['error'],
+                    $download->getErrorMsg()
+                );
             }
         }
 
         if ($succeded) {
-            $this->arrStatusMsg['ok'][] = $_ARRAYLANG['TXT_DOWNLOADS_DOWNLOADS_ASSIGNED_SUCCESS'];
+            $this->arrStatusMsg['ok'][] = $_ARRAYLANG[
+                'TXT_DOWNLOADS_DOWNLOADS_ASSIGNED_SUCCESS'
+            ];
         }
     }
 
