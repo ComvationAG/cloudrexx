@@ -230,6 +230,11 @@ class DownloadsManager extends DownloadsLibrary
                 $this->parseAssignCategoriesToDownloadsDownloadView();
                 $this->parseDownloadNavigation();
                 break;
+            case 'category_assign_categories_to_download':
+                $this->loadCategoryNavigation();
+                $this->parseAssignCategoriesToDownloadsCategoryView();
+                $this->parseCategoryNavigation();
+                break;
             case 'mailtemplate_edit':
             case 'mailtemplate_overview':
             case 'settings':
@@ -1369,6 +1374,19 @@ class DownloadsManager extends DownloadsLibrary
     }
 
     /**
+     * Redirects to the view for assigning categories to downloads, back to the
+     * downloads view.
+     *
+     * @throws \Exception param not exists
+     */
+    protected function parseAssignCategoriesToDownloadsCategoryView()
+    {
+        if ($this->parseAssignCategoriesToDownloads(false)) {
+            $this->categories();
+        }
+    }
+
+    /**
      * Get the view for assigning categories to downloads. Once the form has
      * been sent, the categories will be assigned to the downloads
      *
@@ -2196,6 +2214,10 @@ class DownloadsManager extends DownloadsLibrary
                         $this->arrStatusMsg['error'] = array_merge($this->arrStatusMsg['error'], $objCategory->getErrorMsg());
                     }
                     break;
+                case 'assignCategories':
+                    $this->loadDownloadNavigation();
+                    $this->parseAssignCategoriesToDownloadsCategoryView();
+                    break;
                 case 'unlink':
                     $this->unlinkDownloadsFromCategory($objCategory, isset($_POST['downloads_download_id']) && is_array($_POST['downloads_download_id']) ? $_POST['downloads_download_id'] : array());
                     break;
@@ -2856,7 +2878,8 @@ class DownloadsManager extends DownloadsLibrary
                 'TXT_DOWNLOADS_UNCHECK_ALL'                 => $_ARRAYLANG['TXT_DOWNLOADS_UNCHECK_ALL'],
                 'TXT_DOWNLOADS_SELECT_ACTION'               => $_ARRAYLANG['TXT_DOWNLOADS_SELECT_ACTION'],
                 'TXT_DOWNLOADS_ORDER'                       => $_ARRAYLANG['TXT_DOWNLOADS_ORDER'],
-                'TXT_DOWNLOADS_UNLINK_MULTI'                => $_ARRAYLANG['TXT_DOWNLOADS_UNLINK_MULTI']
+                'TXT_DOWNLOADS_UNLINK_MULTI'                => $_ARRAYLANG['TXT_DOWNLOADS_UNLINK_MULTI'],
+                'TXT_DOWNLOADS_ASSIGN_CATEGORIES'           => $_ARRAYLANG['TXT_DOWNLOADS_ASSIGN_CATEGORIES']
             ));
 
             $this->objTemplate->setVariable(array(
