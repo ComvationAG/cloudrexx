@@ -225,6 +225,11 @@ class DownloadsManager extends DownloadsLibrary
                     $this->parseCategoryNavigation();
                 }
                 break;
+            case 'assign_categories_to_download':
+                $this->loadDownloadNavigation();
+                $this->parseAssignCategoriesToDownloadsDownloadView();
+                $this->parseDownloadNavigation();
+                break;
             case 'mailtemplate_edit':
             case 'mailtemplate_overview':
             case 'settings':
@@ -925,6 +930,11 @@ class DownloadsManager extends DownloadsLibrary
                     $this->updateDownloadOrder(isset($_POST['downloads_download_order']) && is_array($_POST['downloads_download_order']) ? $_POST['downloads_download_order'] : array());
                     break;
 
+                case 'assignCategories':
+                    $this->loadDownloadNavigation();
+                    $this->parseAssignCategoriesToDownloadsDownloadView();
+                    break;
+
                 case 'delete':
                     $this->deleteDownloads(isset($_POST['downloads_download_id']) && is_array($_POST['downloads_download_id']) ? $_POST['downloads_download_id'] : array());
                     break;
@@ -1026,6 +1036,7 @@ class DownloadsManager extends DownloadsLibrary
         ) {
             $changeOrderAllowed = true;
             $this->objTemplate->setVariable('TXT_DOWNLOADS_ORDER', $_ARRAYLANG['TXT_DOWNLOADS_ORDER']);
+            $this->objTemplate->setVariable('TXT_DOWNLOADS_ASSIGN_CATEGORIES', $_ARRAYLANG['TXT_DOWNLOADS_ASSIGN_CATEGORIES']);
             $this->objTemplate->parse('downloads_download_change_order_action');
         } else {
             $changeOrderAllowed = false;
@@ -1341,6 +1352,19 @@ class DownloadsManager extends DownloadsLibrary
             $this->arrStatusMsg['error'][] = sprintf($_ARRAYLANG['TXT_DOWNLOADS_DOWNLOAD_ORDER_SET_FAILED'], implode(', ', $arrFailedDownloads));
         } else {
             $this->arrStatusMsg['ok'][] = $_ARRAYLANG['TXT_DOWNLOADS_DOWNLOAD_ORDER_SET_SUCCESS'];
+        }
+    }
+
+    /**
+     * Redirects to the view for assigning categories to downloads, back to the
+     * category view
+     *
+     * @throws \Exception param not exists
+     */
+    protected function parseAssignCategoriesToDownloadsDownloadView()
+    {
+        if ($this->parseAssignCategoriesToDownloads(true)) {
+            $this->downloads();
         }
     }
 
