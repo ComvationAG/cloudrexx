@@ -56,7 +56,8 @@ CREATE TABLE `contrexx_access_user_attribute_value` (
   `value` text NOT NULL,
   PRIMARY KEY (`attribute_id`,`user_id`,`history_id`),
   FULLTEXT KEY `value` (`value`),
-  INDEX `contrexx_access_user_attribute_value_user_id_ibfk` (`user_id`)
+  INDEX `contrexx_access_user_attribute_value_user_id_ibfk` (`user_id`),
+  INDEX `attribute_user_idx` (`attribute_id`, `user_id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_user_core_attribute` (
   `id` varchar(25) NOT NULL,
@@ -612,7 +613,8 @@ CREATE TABLE `contrexx_log_entry` (
   UNIQUE KEY `log_version_lookup_idx` (`version`,`object_id`,`object_class`),
   KEY `log_class_lookup_idx` (`object_class`),
   KEY `log_date_lookup_idx` (`logged_at`),
-  KEY `log_user_lookup_idx` (`username`)
+  KEY `log_user_lookup_idx` (`username`),
+  INDEX `log_id_class_lookup_idx` ( `object_id`, `object_class`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_block_blocks` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -2239,11 +2241,25 @@ CREATE TABLE `contrexx_module_jobs_categories` (
   `sort_style` enum('alpha','date','date_alpha') NOT NULL DEFAULT 'alpha',
   PRIMARY KEY (`catid`)
 ) ENGINE=InnoDB ;
+CREATE TABLE `contrexx_module_jobs_flag` (
+  `id` int NOT NULL AUTO_INCREMENT ,
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `icon` text NOT NULL,
+  `value` text NOT NULL,
+  PRIMARY KEY(`id`)
+) ENGINE = InnoDB;
 CREATE TABLE `contrexx_module_jobs_location` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
+CREATE TABLE `contrexx_module_jobs_rel_flag_job` (
+  `job` int(6) unsigned NOT NULL,
+  `flag` int NOT NULL,
+  PRIMARY KEY (`job`,`flag`),
+  CONSTRAINT `contrexx_module_jobs_rel_flag_job_ibfk_1` FOREIGN KEY (`job`) REFERENCES `contrexx_module_jobs` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `contrexx_module_jobs_rel_flag_job_ibfk_2` FOREIGN KEY (`flag`) REFERENCES `contrexx_module_jobs_flag` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB;
 CREATE TABLE `contrexx_module_jobs_rel_loc_jobs` (
   `job` int(10) unsigned NOT NULL DEFAULT '0',
   `location` int(10) unsigned NOT NULL DEFAULT '0',
@@ -3164,7 +3180,8 @@ CREATE TABLE `contrexx_module_recommend` (
   `name` varchar(255) NOT NULL DEFAULT '',
   `value` text NOT NULL,
   `lang_id` int(11) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `data` (`name`,`lang_id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_repository` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,

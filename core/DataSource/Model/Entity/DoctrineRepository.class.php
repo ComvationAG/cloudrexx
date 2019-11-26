@@ -126,7 +126,10 @@ class DoctrineRepository extends DataSource {
                 if ($operation == 'in') {
                     $value = explode(',', $value);
                 }
-                $criteria[$field] = array($operation => $value);
+                if (!isset($criteria[$field])) {
+                    $criteria[$field] = array();
+                }
+                $criteria[$field][$operation] = $value;
             }
         }
 
@@ -219,6 +222,10 @@ class DoctrineRepository extends DataSource {
             array(
                 'recursions' => $configuredRecursions,
                 'skipVirtual' => true,
+                'dateFormatDatetime' => 'c',
+                'dateFormatTimestamp' => 'c',
+                'dateFormatDate' => ASCMS_DATE_FORMAT_INTERNATIONAL_DATE,
+                'dateFormatTime' => ASCMS_DATE_FORMAT_INTERNATIONAL_TIME,
             )
         );
         if (count($fieldList)) {
@@ -403,13 +410,26 @@ class DoctrineRepository extends DataSource {
             }
 
             $fieldDefinition = $entityClassMetadata->getFieldMapping($name);
-            if ($fieldDefinition['type'] == 'datetime') {
-                $data[$name] = new \DateTime($data[$name]);
-            } elseif ($fieldDefinition['type'] == 'array') {
-                // verify that the value is actually an array -> prevent to store other php data
-                if (!is_array($data[$name])) {
-                    $data[$name] = array();
-                }
+            switch ($fieldDefinition['type']) {
+                case 'datetime':
+                case 'timestamp':
+                case 'date':
+                case 'time':
+                    if (!$data[$name]) {
+                        // Empty values must be NULL, or Doctrine will fail
+                        $data[$name] = null;
+                    }
+                    if ($data[$name] && !($data[$name] instanceof \DateTime)) {
+                        // Throws on invalid input
+                        $data[$name] = new \DateTime($data[$name]);
+                    }
+                    break;
+                case 'array':
+                    // verify that the value is actually an array -> prevent to store other php data
+                    if (!is_array($data[$name])) {
+                        $data[$name] = array();
+                    }
+                    break;
             }
 
             $fieldSetMethodName = 'set'.preg_replace('/_([a-z])/', '\1', ucfirst($name));

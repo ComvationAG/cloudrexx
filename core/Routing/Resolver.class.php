@@ -153,6 +153,15 @@ class Resolver {
     protected $additionalPath = '';
 
     /**
+     * List of pages that have been resolved
+     *
+     * This is used to detect infinite internal redirection loops
+     *
+     * @var array
+     */
+    protected $resolveStack = array();
+
+    /**
      * @param Url $url the url to resolve
      * @param integer $lang the language Id
      * @param $entityManager
@@ -264,8 +273,27 @@ class Resolver {
                 $page_template,
                 $now, $start, $end, $plainSection;
 
-        $section = isset($_REQUEST['section']) ? $_REQUEST['section'] : '';
-        $command = isset($_REQUEST['cmd']) ? contrexx_addslashes($_REQUEST['cmd']) : '';
+        $section = '';
+        if (
+            isset($_REQUEST['section']) &&
+            !is_array($_REQUEST['section']) &&
+            preg_match('/^[a-z0-9]+$/i', $_REQUEST['section'])
+        ) {
+            $section = $_REQUEST['section'];
+        }
+        $command = '';
+        if (
+            isset($_REQUEST['cmd']) &&
+            !is_array($_REQUEST['cmd']) &&
+            preg_match(
+                '/^([-a-z0-9_]+|\[\[' .
+                    \Cx\Core\Routing\NodePlaceholder::NODE_URL_PCRE .
+                    '\]\])$/ix',
+                $_REQUEST['cmd']
+            )
+        ) {
+            $command = $_REQUEST['cmd'];
+        }
         $history = isset($_REQUEST['history']) ? intval($_REQUEST['history']) : 0;
 
 
@@ -739,6 +767,19 @@ class Resolver {
                 if (!$targetPage || !$targetPage->isActive()) {
                     $this->page = null;
                     return;
+                }
+
+                // Ensure the resolved target page has not yet been resolved
+                // before. If it has however, then that means we are in an
+                // infinite redirect loop and must abort the resolving process.
+                if (in_array($targetPage, $this->resolveStack)) {
+                    \DBG::msg(__METHOD__ . ': internal infinite redirection');
+                    \header($_SERVER['SERVER_PROTOCOL'] . ' 502 Bad Gateway');
+                    // remove CSRF token
+                    output_reset_rewrite_vars();
+                    throw new \Cx\Core\Core\Controller\InstanceException();
+                } else {
+                    $this->resolveStack[] = $targetPage;
                 }
 
                 // the redirection page is located within a different language.
