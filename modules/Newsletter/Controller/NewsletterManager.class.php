@@ -655,6 +655,13 @@ class NewsletterManager extends NewsletterLib
                     $selectedNews[] = $newsId;
                 }
             }
+
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $selectedLang = FRONTEND_LANG_ID;
+            if ($cx->getRequest()->hasParam('selectedLang', false)) {
+                $selectedLang = $cx->getRequest()->getParam('selectedLang', false);
+            }
+
             $HTML_TemplateSource_Import = $this->_getBodyContent($this->_prepareNewsPreview($this->GetTemplateSource($importTemplate, 'html')));
             $_REQUEST['standalone'] = true;
 
@@ -679,8 +686,8 @@ class NewsletterManager extends NewsletterLib
                     INNER JOIN  '.DBPREFIX.'module_news_categories_locale AS nc ON nc.category_id = nr.category_id
                     WHERE       status = 1
                                 AND nl.is_active=1
-                                AND nl.lang_id='.FRONTEND_LANG_ID.'
-                                AND nc.lang_id='.FRONTEND_LANG_ID.'
+                                AND nl.lang_id='.$selectedLang.'
+                                AND nc.lang_id='.$selectedLang.'
                                 AND n.id IN ('.implode(",", contrexx_input2int($selectedNews)).')
                     ORDER BY nc.name ASC, n.date DESC';
 
