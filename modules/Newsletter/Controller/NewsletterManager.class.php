@@ -4031,14 +4031,42 @@ class NewsletterManager extends NewsletterLib
             $newsdate = $this->dateFromInput(contrexx_input2raw($_POST['newsDate']));
         }
 
+        // build select for news language
+        $select = new \Cx\Core\Html\Model\Entity\DataElement(
+            'newsLang',
+            '',
+            \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT
+        );
+        $select->setAttribute('id', 'news-lang');
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+
+        $selectedLang = FRONTEND_LANG_ID;
+        if ($cx->getRequest()->hasParam('newsLang', false)) {
+            $selectedLang = $cx->getRequest()->getParam('newsLang', false);
+        }
+
+        $sourceLangs = $em->getRepository('Cx\Core\Locale\Model\Entity\Locale')->findAll();
+        foreach ($sourceLangs as $lang) {
+            $option = new \Cx\Core\Html\Model\Entity\HtmlElement('option');
+            $option->setAttribute('value', $lang->getId());
+            $option->addChild(new \Cx\Core\Html\Model\Entity\TextElement($lang));
+            if ($selectedLang == $lang->getId()) {
+                $option->setAttribute('selected');
+            }
+            $select->addChild($option);
+        }
+
         $this->_pageTitle = $_ARRAYLANG['TXT_NEWSLETTER_NEWS_IMPORT'];
         $this->_objTpl->loadTemplateFile('newsletter_news.html');
         $this->_objTpl->setVariable(array(
             'TXT_NEWS_IMPORT' => $_ARRAYLANG['TXT_NEWSLETTER_NEWS_IMPORT'],
             'TXT_DATE_SINCE' => $_ARRAYLANG['TXT_NEWSLETTER_NEWS_DATE_SINCE'],
+            'TXT_NEWSLETTER_NEWS_IMPORT_LANG' => $_ARRAYLANG['TXT_NEWSLETTER_LANGUAGE'],
             'TXT_SELECTED_MESSAGES' => $_ARRAYLANG['TXT_NEWSLETTER_NEWS_SELECTED_MESSAGES'],
             'TXT_NEXT' => $_ARRAYLANG['TXT_NEWSLETTER_NEWS_NEXT'],
-            'NEWS_CREATE_DATE' => $this->valueFromDate($newsdate)
+            'NEWS_CREATE_DATE' => $this->valueFromDate($newsdate),
+            'NEWSLETTER_NEWS_IMPORT_LANG_SELECT' => $select
         ));
 
         $query = ' SELECT   n.id,
@@ -4053,10 +4081,10 @@ class NewsletterManager extends NewsletterLib
                             cl.name    AS categoryName,
                             tl.name    AS typename
                     FROM '.DBPREFIX.'module_news n
-                    LEFT JOIN '.DBPREFIX.'module_news_locale nl ON n.id = nl.news_id AND nl.lang_id='.$objInit->userFrontendLangId.'
+                    LEFT JOIN '.DBPREFIX.'module_news_locale nl ON n.id = nl.news_id AND nl.lang_id='.$selectedLang.'
                     LEFT JOIN '.DBPREFIX.'module_news_rel_categories AS nc ON nc.news_id = n.id
-                    LEFT JOIN '.DBPREFIX.'module_news_categories_locale AS cl ON cl.category_id = nc.category_id AND cl.lang_id ='.$objInit->userFrontendLangId.'
-                    LEFT JOIN '.DBPREFIX.'module_news_types_locale tl ON n.typeid = tl.type_id AND tl.lang_id='.$objInit->userFrontendLangId.'
+                    LEFT JOIN '.DBPREFIX.'module_news_categories_locale AS cl ON cl.category_id = nc.category_id AND cl.lang_id ='.$selectedLang.'
+                    LEFT JOIN '.DBPREFIX.'module_news_types_locale tl ON n.typeid = tl.type_id AND tl.lang_id='.$selectedLang.'
                     WHERE n.date > '.$newsdate.'
                             AND n.status = "1"
                             AND n.validated = "1"
