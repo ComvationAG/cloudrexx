@@ -4165,7 +4165,12 @@ class NewsletterManager extends NewsletterLib
                                 ? contrexx_input2int($_POST['newsletter_mail_template'])
                                 : '2';
 
+	$cx = \Cx\Core\Core\Controller\Cx::instanciate();
 	if (isset($_GET['view']) && $_GET['view'] == 'iframe') {
+            $selectedLang = FRONTEND_LANG_ID;
+	        if ($cx->getRequest()->hasParam('selectedLang', false)) {
+	            $selectedLang = $cx->getRequest()->getParam('selectedLang', false);
+            }
             $selectedCategoryNews = isset($_POST['selected'])
                                       ? json_decode(contrexx_input2raw($_POST['selected']), true)
                                       : '';
@@ -4208,8 +4213,8 @@ class NewsletterManager extends NewsletterLib
                     INNER JOIN  '.DBPREFIX.'module_news_categories_locale AS nc ON nc.category_id = nr.category_id
                     WHERE       status = 1
                                 AND nl.is_active=1
-                                AND nl.lang_id='.FRONTEND_LANG_ID.'
-                                AND nc.lang_id='.FRONTEND_LANG_ID.'
+                                AND nl.lang_id='.$selectedLang.'
+                                AND nc.lang_id='.$selectedLang.'
                                 AND n.id IN ('.implode(",", $selectedNews).')
                     ORDER BY nc.name ASC, n.date DESC';
 
@@ -4246,6 +4251,11 @@ class NewsletterManager extends NewsletterLib
         } else {
             $selectedNews = isset($_POST['selectedNews']) ? contrexx_input2raw($_POST['selectedNews']) : '';
 
+            $selectedLang = FRONTEND_LANG_ID;
+            if ($cx->getRequest()->hasParam(newsLang, false)) {
+                $selectedLang = contrexx_input2raw($cx->getRequest()->getParam(newsLang, false));
+            }
+
             $this->_pageTitle = $_ARRAYLANG['TXT_NEWSLETTER_NEWS_IMPORT_PREVIEW'];
             $this->_objTpl->loadTemplateFile('newsletter_news_preview.html');
             $this->_objTpl->setVariable(array(
@@ -4257,7 +4267,8 @@ class NewsletterManager extends NewsletterLib
             'NEWSLETTER_IMPORT_TEMPLATE_MENU' => $this->_getTemplateMenu($importTemplate, 'id="newsletter_import_template" name="newsletter_import_template" style="width:300px;" onchange="refreshIframe();"', 'news'),
                 'NEWSLETTER_SELECTED_NEWS' => json_encode($selectedNews),
             'NEWSLETTER_SELECTED_EMAIL_TEMPLATE' => $mailTemplate,
-            'NEWSLETTER_SELECTED_IMPORT_TEMPLATE' => $importTemplate
+            'NEWSLETTER_SELECTED_IMPORT_TEMPLATE' => $importTemplate,
+                'NEWSLETTER_SELECTED_LANG' => $selectedLang,
             ));
         }
     }
