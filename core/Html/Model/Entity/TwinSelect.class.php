@@ -105,13 +105,13 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
      */
     public function __construct(
         $wrapperName,
-        $associatedName = 'associated',
-        $associatedTitle = '',
-        $associatedValues = array(),
-        $notAssociatedName = 'not_associated',
-        $notAssociatedTitle = '',
-        $notAssociatedValues = array(),
-        $form = 'form',
+        $associatedName,
+        $associatedTitle,
+        $associatedValues,
+        $notAssociatedName,
+        $notAssociatedTitle,
+        $notAssociatedValues,
+        $form,
         $validator = null
     ) {
         global $_ARRAYLANG, $objInit;
