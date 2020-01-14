@@ -293,13 +293,13 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
     /**
      * Get a select element that has additional attributes
      *
-     * @param string $name   name of the select element
-     * @param array  $values values for select
-     * @param \Cx\Core\Validate\Model\Entity\Validator $validator to validate
+     * @param string $name           name of the select element
+     * @param array  $values         values for select
+     * @param array  $selectedValues the selected values
      *
      * @return DataElement
      */
-    protected function getSelect($name, $values, $validator)
+    protected function getSelect($name, $values, $selectedValues = array())
     {
         $selector = new \Cx\Core\Html\Model\Entity\DataElement(
             $name .'[]',
@@ -317,6 +317,12 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
                 'title',
                 $values[$child->getAttribute('value')]
             );
+            if (!empty($selectedValues[$child->getAttribute('value')])) {
+                $child->setAttribute(
+                    'selected',
+                    true
+                );
+            }
         }
 
         return $selector;
