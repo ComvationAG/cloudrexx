@@ -112,6 +112,15 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
     protected $delimiter = '\\';
 
     /**
+     * Activate the "chosen" element. If the number of possible and selected values is less than or equal to a defined
+     * value (this can be changed in the Global Configuration), the "chosen" element is displayed, otherwise both
+     * selects are displayed.
+     *
+     * @var bool
+     */
+    protected $enableChosen = true;
+
+    /**
      * TwinSelect constructor
      *
      * The notAssociatedValues do not necessarily have to contain only the
@@ -140,6 +149,7 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
         $notAssociatedTitle,
         $notAssociatedValues,
         $form,
+        $enableChosen = true,
         $validator = null
     ) {
         global $_ARRAYLANG, $objInit;
@@ -157,15 +167,41 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
         $this->associatedValues = $associatedValues;
         $this->notAssociatedValues = $notAssociatedValues;
         $this->validator = $validator;
+        $this->enableChosen = $enableChosen;
 
-        // Remove the values, that are associated
         \Cx\Core\Html\Model\Entity\HtmlElement::__construct('div');
         $this->setAttribute('id', $this->wrapperName);
         $this->addClass('twin-select');
 
-        foreach ($associatedValues as $key=>$value) {
-            if (isset($notAssociatedValues[$key])) {
-                unset($notAssociatedValues[$key]);
+        $totalValues = count($notAssociatedValues) + count($associatedValues);
+
+        if ($this->enableChosen && $totalValues <= 30) {
+            $this->initChosen();
+        } else {
+            $this->enableChosen = false;
+            $this->initTwinSelect();
+        }
+    }
+
+    public function initChosen()
+    {
+        $mergedValues = array_replace($this->notAssociatedValues, $this->associatedValues);
+        $select = $this->getSelect(
+            $this->associatedName, $mergedValues, $this->associatedValues
+        );
+        $select->addClass('init-chosen');
+        $select->setAttribute('data-placeholder', $this->associatedTitle);
+        $this->addChild($select);
+    }
+
+    public function initTwinSelect()
+    {
+        global $_ARRAYLANG;
+
+        // Remove the values, that are associated
+        foreach ($this->associatedValues as $key=>$value) {
+            if (isset($this->notAssociatedValues[$key])) {
+                unset($this->notAssociatedValues[$key]);
             }
         }
 
@@ -359,14 +395,20 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
      */
     public function render()
     {
-        $scope = 'twin-select-' . $this->wrapperName;
-        // load Twinselect JavaScript code and CSS styles
         $directory = $this->getComponentController()->getDirectory(
             true, true
         );
+        if ($this->enableChosen) {
+            \JS::activate('chosen');
+            \JS::registerJS($directory . '/View/Script/ChosenElement.js');
+            return parent::render();
+        }
+
+        $scope = 'twin-select-' . $this->wrapperName;
+        // load Twinselect JavaScript code and CSS styles
         \JS::registerCSS($directory . '/View/Style/TwinSelect.css');
         \JS::registerJS($directory . '/View/Script/TwinSelect.js');
-        \JS::registerCode('TwinSelectScopes.push("'.$scope.'");');
+        \JS::registerCode('TwinSelectScopes.push("' . $scope . '");');
 
         // Set JavaScript variables
         $cxJs = \ContrexxJavascript::getInstance();
