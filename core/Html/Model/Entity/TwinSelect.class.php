@@ -77,6 +77,34 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
     protected $notAssociatedName;
 
     /**
+     * Title of the associated select
+     *
+     * @var string
+     */
+    protected $associatedTitle;
+
+    /**
+     * Title of the not associated select
+     *
+     * @var string
+     */
+    protected $notAssociatedTitle;
+
+    /**
+     * Values of the associated select
+     *
+     * @var array
+     */
+    protected $associatedValues;
+
+    /**
+     * Values of the not associated select
+     *
+     * @var array
+     */
+    protected $notAssociatedValues;
+
+    /**
      * Delimiter with which parents and child elements are separated
      *
      * @var string
@@ -124,10 +152,15 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
         $this->form = $form;
         $this->associatedName = $associatedName;
         $this->notAssociatedName = $notAssociatedName;
+        $this->associatedTitle = $associatedTitle;
+        $this->notAssociatedTitle = $notAssociatedTitle;
+        $this->associatedValues = $associatedValues;
+        $this->notAssociatedValues = $notAssociatedValues;
+        $this->validator = $validator;
 
         // Remove the values, that are associated
         \Cx\Core\Html\Model\Entity\HtmlElement::__construct('div');
-        $this->setAttribute('id', $wrapperName);
+        $this->setAttribute('id', $this->wrapperName);
         $this->addClass('twin-select');
 
         foreach ($associatedValues as $key=>$value) {
@@ -144,10 +177,10 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
 
         // Selects
         $associatedSelector = $this->getSelect(
-            $associatedName, $associatedValues, $validator
+            $this->associatedName, $this->associatedValues, $this->validator
         );
         $notAssociatedSelector = $this->getSelect(
-            $notAssociatedName, $notAssociatedValues, $validator
+            $this->notAssociatedName, $this->notAssociatedValues, $this->validator
         );
 
         // Buttons
@@ -214,10 +247,10 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
 
         // Add titles for select elements
         $associatedTitleElement = new \Cx\Core\Html\Model\Entity\TextElement(
-            $associatedTitle . '<br/>'
+            $this->associatedTitle . '<br/>'
         );
         $notAssociatedTitleElement = new \Cx\Core\Html\Model\Entity\TextElement(
-            $notAssociatedTitle . '<br/>'
+            $this->notAssociatedTitle . '<br/>'
         );
 
         // Add elements to their wrappers
@@ -272,7 +305,7 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
             $name .'[]',
             '',
             'select',
-            $validator,
+            $this->validator,
             $values
         );
         $selector->setAttribute('class', $name);
