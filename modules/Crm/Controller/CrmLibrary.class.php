@@ -2232,6 +2232,55 @@ class CrmLibrary
     }
 
     /**
+     * Parse Membership select
+     *
+     * @param Template Object $objTpl      Template object
+     * @param array           $memberShips membership ids
+     * @param string          $form        associated form
+     * @param string          $block       block to parse
+     * @param string          $name        name of the select
+     * @param array           $selected    selected values
+     * @param array           $lang        array with lang placeholder for select description
+     */
+    public function parseMembershipSelect($objTpl, $memberShips, $form, $block, $name = "assigned_group", $selected = array(), $lang = array())
+    {
+        $langAssociated = '';
+        if (!empty($lang['associated'])) {
+            $langAssociated = $lang['associated'];
+        }
+        $langNotAssociated = '';
+        if (!empty($lang['notAssociated'])) {
+            $langNotAssociated = $lang['notAssociated'];
+        }
+
+        $convertedList = array();
+        $convertedListSelected = array();
+        foreach ($memberShips as $id) {
+            if (in_array($id, $selected)) {
+                $convertedList[$id] = contrexx_raw2xhtml($this->_memberShips[$id]);
+            } else {
+                $convertedListSelected[$id] = contrexx_raw2xhtml($this->_memberShips[$id]);
+            }
+        }
+
+        $membershipSelect = new \Cx\Core\Html\Model\Entity\TwinSelect(
+            'wrapper_' . $name,
+            $name,
+            $langAssociated,
+            $convertedList,
+            $name . 'excluded',
+            $langNotAssociated,
+            $convertedListSelected,
+            $form
+        );
+        $objTpl->setVariable(
+            array(
+                $block => $membershipSelect,
+            )
+        );
+    }
+
+    /**
      * Get membership dropdown for overview page
      *
      * @param Template Object $objTpl          Template object
