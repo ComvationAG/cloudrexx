@@ -174,8 +174,12 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
         $this->addClass('twin-select');
 
         $totalValues = count($notAssociatedValues) + count($associatedValues);
+        \Cx\Core\Setting\Controller\Setting::init('Config', 'otherConfigurations', 'FileSystem');
 
-        if ($this->enableChosen && $totalValues <= 30) {
+        if (
+            $this->enableChosen &&
+            $totalValues <= \Cx\Core\Setting\Controller\Setting::getValue('coreSimpleSelectLimit')
+        ) {
             $this->initChosen();
         } else {
             $this->enableChosen = false;
