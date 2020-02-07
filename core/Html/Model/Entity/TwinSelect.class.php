@@ -213,17 +213,18 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
         );
 
         // Add titles for select elements
-        $associatedTitleElement = new \Cx\Core\Html\Model\Entity\TextElement(
-            $associatedTitle . '<br/>'
-        );
-        $notAssociatedTitleElement = new \Cx\Core\Html\Model\Entity\TextElement(
-            $notAssociatedTitle . '<br/>'
-        );
+        $associatedTitleElement = new \Cx\Core\Html\Model\Entity\TextElement($associatedTitle);
+        $associatedTitleSpan = new \Cx\Core\Html\Model\Entity\HtmlElement('span');
+        $associatedTitleSpan->addChild($associatedTitleElement);
+
+        $notAssociatedTitleElement = new \Cx\Core\Html\Model\Entity\TextElement($notAssociatedTitle);
+        $notAssociatedTitleSpan = new \Cx\Core\Html\Model\Entity\HtmlElement('span');
+        $notAssociatedTitleSpan->addChild($notAssociatedTitleElement);
 
         // Add elements to their wrappers
         $associatedWrapper->addChildren(
             array(
-                $associatedTitleElement,
+                $associatedTitleSpan,
                 $associatedSelector,
                 $associatedLinkWrapper
             )
@@ -231,7 +232,7 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
 
         $notAssociatedWrapper->addChildren(
             array(
-                $notAssociatedTitleElement,
+                $notAssociatedTitleSpan,
                 $notAssociatedSelector,
                 $notAssociatedLinkWrapper,
             )

@@ -43,3 +43,6 @@
     margin: 0 5px;
     pointer-events: none;
 }
+.twin-select span {
+    display: block;
+}
