@@ -334,18 +334,15 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
 
         // Set JavaScript variables
         $cxJs = \ContrexxJavascript::getInstance();
-        $cxJs->setVariable('associated_form', $this->form, $scope);
         $cxJs->setVariable(
-            'associated_wrapper', $this->wrapperName, $scope
-        );
-        $cxJs->setVariable(
-            'associated_select', $this->associatedName, $scope
-        );
-        $cxJs->setVariable(
-            'not_associated_select', $this->notAssociatedName, $scope
-        );
-        $cxJs->setVariable(
-            'delimiter', $this->delimiter, $scope
+            array(
+                'associated_form' => $this->form,
+                'associated_wrapper' => $this->wrapperName,
+                'associated_select' => $this->associatedName,
+                'not_associated_select' => $this->notAssociatedName,
+                'delimiter' => $this->delimiter
+            ),
+            $scope
         );
 
         return parent::render();
