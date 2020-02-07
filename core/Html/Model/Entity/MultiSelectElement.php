@@ -172,45 +172,27 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
             'div'
         );
         $associatedLinkWrapper->addClass('control-links');
-        $associatedSelectAllLink = $this->getControlElement(
+        $selectAllLink = $this->getControlElement(
             'a',
-            'select-all-associated',
+            'select-all',
             $langData['TXT_CORE_HTML_MULTI_SELECT_SELECT_ALL']
         );
-        $associatedDeselectAllLink = $this->getControlElement(
+        $deselectAllLink = $this->getControlElement(
             'a',
-            'deselect-all-associated',
-            $langData['TXT_CORE_HTML_MULTI_SELECT_DESELECT_ALL']
-        );
-
-        $notAssociatedLinkWrapper = new \Cx\Core\Html\Model\Entity\HtmlElement(
-            'div'
-        );
-        $notAssociatedLinkWrapper->addClass('control-links');
-        $notAssociatedSelectAllLink = $this->getControlElement(
-            'a',
-            'select-all-not-associated',
-            $langData['TXT_CORE_HTML_MULTI_SELECT_SELECT_ALL']
-        );
-        $notAssociatedDeselectAllLink = $this->getControlElement(
-            'a',
-            'deselect-all-not-associated',
+            'deselect-all',
             $langData['TXT_CORE_HTML_MULTI_SELECT_DESELECT_ALL']
         );
 
         $associatedLinkWrapper->addChildren(
             array(
-                $associatedSelectAllLink,
-                $associatedDeselectAllLink
+                $selectAllLink,
+                $deselectAllLink
             )
         );
 
-        $notAssociatedLinkWrapper->addChildren(
-            array(
-                $notAssociatedSelectAllLink,
-                $notAssociatedDeselectAllLink
-            )
-        );
+        $notAssociatedLinkWrapper = clone $associatedLinkWrapper;
+        $associatedLinkWrapper->addClass('multi-select-associated');
+        $notAssociatedLinkWrapper->addClass('multi-select-not-associated');
 
         // Add titles for select elements
         $associatedTitleElement = new \Cx\Core\Html\Model\Entity\TextElement($associatedTitle);

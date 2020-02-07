@@ -10,10 +10,10 @@ const MultiSelectElement = function(scope) {
     this.buttonWrapper = this.wrapper.querySelector('.control-buttons');
     this.addBtn = this.wrapper.querySelector('.addBtn');
     this.removeBtn =  this.wrapper.querySelector('.removeBtn');
-    this.associatedSelectAllLinks = this.wrapper.querySelector('.select-all-associated');
-    this.notAssociatedSelectAllLinks = this.wrapper.querySelector('.select-all-not-associated');
-    this.associatedDeselectAllLinks = this.wrapper.querySelector('.deselect-all-associated');
-    this.notAssociatedDeselectAllLinks = this.wrapper.querySelector('.deselect-all-not-associated');
+    this.associatedSelectAllLinks = this.wrapper.querySelector('.multi-select-associated .select-all');
+    this.notAssociatedSelectAllLinks = this.wrapper.querySelector('.multi-select-not-associated .select-all');
+    this.associatedDeselectAllLinks = this.wrapper.querySelector('.multi-select-associated .deselect-all');
+    this.notAssociatedDeselectAllLinks = this.wrapper.querySelector('.multi-select-not-associated .deselect-all');
 
     this.moveOptions = function (from, dest, add, remove) {
         if (from.selectedIndex < 0) {
