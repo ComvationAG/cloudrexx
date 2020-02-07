@@ -114,11 +114,9 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
         $form,
         $validator = null
     ) {
-        global $_ARRAYLANG, $objInit;
-
         //get the language interface text
-        $langData   = $objInit->loadLanguageData('Html');
-        $_ARRAYLANG = array_merge($_ARRAYLANG, $langData);
+        $frontend = $this->cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
+        $langData = \Env::get('init')->getComponentSpecificLanguageData('Html', $frontend);
 
         $this->wrapperName = $wrapperName;
         $this->form = $form;
@@ -158,12 +156,12 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
         $addButton = $this->getControlElement(
             'button',
             'addBtn',
-            $_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_ADD_ENTRY']
+            $langData['TXT_CORE_HTML_TWIN_SELECT_ADD_ENTRY']
         );
         $removeButton = $this->getControlElement(
             'button',
             'removeBtn',
-            $_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_REMOVE_ENTRY']
+            $langData['TXT_CORE_HTML_TWIN_SELECT_REMOVE_ENTRY']
         );
         $btnWrapper->addChildren(
             array($addButton, $removeButton)
@@ -177,12 +175,12 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
         $associatedSelectAllLink = $this->getControlElement(
             'a',
             'select-all-associated',
-            $_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_SELECT_ALL']
+            $langData['TXT_CORE_HTML_TWIN_SELECT_SELECT_ALL']
         );
         $associatedDeselectAllLink = $this->getControlElement(
             'a',
             'deselect-all-associated',
-            $_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_DESELECT_ALL']
+            $langData['TXT_CORE_HTML_TWIN_SELECT_DESELECT_ALL']
         );
 
         $notAssociatedLinkWrapper = new \Cx\Core\Html\Model\Entity\HtmlElement(
@@ -192,12 +190,12 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
         $notAssociatedSelectAllLink = $this->getControlElement(
             'a',
             'select-all-not-associated',
-            $_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_SELECT_ALL']
+            $langData['TXT_CORE_HTML_TWIN_SELECT_SELECT_ALL']
         );
         $notAssociatedDeselectAllLink = $this->getControlElement(
             'a',
             'deselect-all-not-associated',
-            $_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_DESELECT_ALL']
+            $langData['TXT_CORE_HTML_TWIN_SELECT_DESELECT_ALL']
         );
 
         $associatedLinkWrapper->addChildren(
