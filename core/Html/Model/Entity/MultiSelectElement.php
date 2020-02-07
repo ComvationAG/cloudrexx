@@ -25,7 +25,7 @@
  */
 
 /**
- * With the TwinSelect element you get two multiple-select elements. This makes
+ * With the MultiSelectElement element you get two multiple-select elements. This makes
  * it easier to select entries and post multiple ones.
  *
  * @copyright  Cloudrexx AG
@@ -37,7 +37,7 @@
 namespace Cx\Core\Html\Model\Entity;
 
 /**
- * With the TwinSelect element you get two multiple-select elements. This makes
+ * With the MultiSelectElement element you get two multiple-select elements. This makes
  * it easier to select entries and post multiple ones.
  *
  * @copyright  Cloudrexx AG
@@ -46,10 +46,10 @@ namespace Cx\Core\Html\Model\Entity;
  * @subpackage core_html
  * @since      v5.0.3
  */
-class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
+class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
 {
     /**
-     * Name of the wrapper to identify the TwinSelect
+     * Name of the wrapper to identify the MultiSelectElement
      *
      * @var string
      */
@@ -84,7 +84,7 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
     protected $delimiter = '\\';
 
     /**
-     * TwinSelect constructor
+     * MultiSelectElement constructor
      *
      * The notAssociatedValues do not necessarily have to contain only the
      * not assigned values. All possible entries can also be passed. The arrays
@@ -92,7 +92,7 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
      * same key are removed from the array notAssociatedValues.
      *
      * @param string $wrapperName         name of the wrapper to identify the
-     *                                    TwinSelect
+     *                                    MultiSelectElement
      * @param string $associatedName      name for the associated select
      * @param string $associatedTitle     to describe the select element
      * @param array  $associatedValues    associated values
@@ -125,7 +125,7 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
 
         \Cx\Core\Html\Model\Entity\HtmlElement::__construct('div');
         $this->setAttribute('id', $wrapperName);
-        $this->addClass('twin-select');
+        $this->addClass('multi-select');
 
         // Remove the values, that are associated
         foreach ($associatedValues as $key=>$value) {
@@ -136,9 +136,9 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
 
         // Associated and not associated Wrapper
         $associatedWrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
-        $associatedWrapper->addClass('twin-select-wrapper');
+        $associatedWrapper->addClass('multi-select-wrapper');
         $notAssociatedWrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
-        $notAssociatedWrapper->addClass('twin-select-wrapper');
+        $notAssociatedWrapper->addClass('multi-select-wrapper');
 
         // Selects
         $associatedSelector = $this->getSelect(
@@ -150,18 +150,18 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
 
         // Buttons
         $btnWrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
-        $btnWrapper->addClass('twin-select-wrapper');
+        $btnWrapper->addClass('multi-select-wrapper');
         $btnWrapper->addClass('control-buttons');
 
         $addButton = $this->getControlElement(
             'button',
             'addBtn',
-            $langData['TXT_CORE_HTML_TWIN_SELECT_ADD_ENTRY']
+            $langData['TXT_CORE_HTML_MULTI_SELECT_ADD_ENTRY']
         );
         $removeButton = $this->getControlElement(
             'button',
             'removeBtn',
-            $langData['TXT_CORE_HTML_TWIN_SELECT_REMOVE_ENTRY']
+            $langData['TXT_CORE_HTML_MULTI_SELECT_REMOVE_ENTRY']
         );
         $btnWrapper->addChildren(
             array($addButton, $removeButton)
@@ -175,12 +175,12 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
         $associatedSelectAllLink = $this->getControlElement(
             'a',
             'select-all-associated',
-            $langData['TXT_CORE_HTML_TWIN_SELECT_SELECT_ALL']
+            $langData['TXT_CORE_HTML_MULTI_SELECT_SELECT_ALL']
         );
         $associatedDeselectAllLink = $this->getControlElement(
             'a',
             'deselect-all-associated',
-            $langData['TXT_CORE_HTML_TWIN_SELECT_DESELECT_ALL']
+            $langData['TXT_CORE_HTML_MULTI_SELECT_DESELECT_ALL']
         );
 
         $notAssociatedLinkWrapper = new \Cx\Core\Html\Model\Entity\HtmlElement(
@@ -190,12 +190,12 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
         $notAssociatedSelectAllLink = $this->getControlElement(
             'a',
             'select-all-not-associated',
-            $langData['TXT_CORE_HTML_TWIN_SELECT_SELECT_ALL']
+            $langData['TXT_CORE_HTML_MULTI_SELECT_SELECT_ALL']
         );
         $notAssociatedDeselectAllLink = $this->getControlElement(
             'a',
             'deselect-all-not-associated',
-            $langData['TXT_CORE_HTML_TWIN_SELECT_DESELECT_ALL']
+            $langData['TXT_CORE_HTML_MULTI_SELECT_DESELECT_ALL']
         );
 
         $associatedLinkWrapper->addChildren(
@@ -294,7 +294,7 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
      * Get an element, which consists of the element tag and a text.
      * The defined text is also set as the title.
      *
-     * Used to get the control elements for TwinSelect
+     * Used to get the control elements for MultiSelectElement
      *
      * @param string $tag  the tag name of the element (e.g. button)
      * @param string $name to set the class name for the element
@@ -313,7 +313,7 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
     }
 
     /**
-     * Load the JavaScript and CSS file for TwinSelect. JavaScript variables are
+     * Load the JavaScript and CSS file for MultiSelectElement. JavaScript variables are
      * set, which are necessary for JavaScript to work correctly.
      *
      * @throws     \Cx\Core\Core\Model\Entity\SystemComponentException
@@ -321,14 +321,14 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
      */
     public function render()
     {
-        $scope = 'twin-select-' . $this->wrapperName;
-        // load Twinselect JavaScript code and CSS styles
+        $scope = 'multi-select-' . $this->wrapperName;
+        // load MultiSelectElement JavaScript code and CSS styles
         $directory = $this->getComponentController()->getDirectory(
             true, true
         );
-        \JS::registerCSS($directory . '/View/Style/TwinSelect.css');
-        \JS::registerJS($directory . '/View/Script/TwinSelect.js');
-        \JS::registerCode('TwinSelectScopes.push("'.$scope.'");');
+        \JS::registerCSS($directory . '/View/Style/MultiSelectElement.css');
+        \JS::registerJS($directory . '/View/Script/MultiSelectElement.js');
+        \JS::registerCode('MultiSelectElementScopes.push("'.$scope.'");');
 
         // Set JavaScript variables
         $cxJs = \ContrexxJavascript::getInstance();

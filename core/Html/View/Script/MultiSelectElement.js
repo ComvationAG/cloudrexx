@@ -1,7 +1,7 @@
-var TwinSelectScopes = [];
-var TwinSelects = [];
+var MultiSelectElementScopes = [];
+var MultiSelectElements = [];
 
-const TwinSelect = function(scope) {
+const MultiSelectElement = function(scope) {
     this.delimiter = cx.variables.get('delimiter', scope);
     this.wrapper = document.getElementById(cx.variables.get('associated_wrapper', scope));
     this.form = document.getElementById(cx.variables.get('associated_form', scope));
@@ -163,25 +163,25 @@ const TwinSelect = function(scope) {
     this.initEventListeners();
 };
 
-function initTwinSelect() {
-    TwinSelectScopes.forEach(function (scope) {
-        const twinSelect = new TwinSelect(scope);
-        TwinSelects.push(twinSelect);
+function initMultiSelectElement() {
+    MultiSelectElementScopes.forEach(function (scope) {
+        const multiSelect = new MultiSelectElement(scope);
+        MultiSelectElements.push(multiSelect);
         window.addEventListener('resize', function () {
-            twinSelect.size();
+            multiSelect.size();
         });
-        twinSelect.size();
+        multiSelect.size();
     });
 }
 
-function resizeTwinSelects() {
-    TwinSelects.forEach(function (twinSelect) {
-        twinSelect.size();
+function resizeMultiSelectElements() {
+    MultiSelectElements.forEach(function (multiSelect) {
+        multiSelect.size();
     });
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    initTwinSelect();
+    initMultiSelectElement();
 });
 
 
