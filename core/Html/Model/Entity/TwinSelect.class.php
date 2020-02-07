@@ -152,7 +152,9 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
 
         // Buttons
         $btnWrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
-        $btnWrapper->addClass('twin-select-wrapper control-buttons');
+        $btnWrapper->addClass('twin-select-wrapper');
+        $btnWrapper->addClass('control-buttons');
+
         $addButton = $this->getControlElement(
             'button',
             'addBtn',
