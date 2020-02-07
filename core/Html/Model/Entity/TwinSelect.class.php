@@ -125,11 +125,11 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
         $this->associatedName = $associatedName;
         $this->notAssociatedName = $notAssociatedName;
 
-        // Remove the values, that are associated
         \Cx\Core\Html\Model\Entity\HtmlElement::__construct('div');
         $this->setAttribute('id', $wrapperName);
         $this->addClass('twin-select');
 
+        // Remove the values, that are associated
         foreach ($associatedValues as $key=>$value) {
             if (isset($notAssociatedValues[$key])) {
                 unset($notAssociatedValues[$key]);
