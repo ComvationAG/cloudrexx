@@ -228,7 +228,7 @@ class Search
                 $objTpl->blockExists('has_protected_search_result') &&
                 $coreListProtectedPages
             ) {
-                $objTpl->touchBlock('has_protected_search_result');
+                $objTpl->touchBlock('search_has_protected_search_result');
             }
 
             $countResults = sizeof($arraySearchResults);
