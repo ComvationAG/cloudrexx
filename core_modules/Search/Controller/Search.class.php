@@ -223,10 +223,10 @@ class Search
             // no sense to display this block, since the protected search
             // results are listed.
             if (
-                !\FWUser::getFWUserObject()->objUser->isLoggedIn() &&
+                $coreListProtectedPages === 'on' &&
+                $objTpl->blockExists('search_has_protected_search_result') &&
                 $this->hasProtectedResult() &&
-                $objTpl->blockExists('has_protected_search_result') &&
-                $coreListProtectedPages
+                !\FWUser::getFWUserObject()->objUser->isLoggedIn()
             ) {
                 $objTpl->touchBlock('search_has_protected_search_result');
             }
