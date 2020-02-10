@@ -192,7 +192,6 @@ class Search
     {
         global $_CONFIG, $_ARRAYLANG;
 
-        \Cx\Core\Setting\Controller\Setting::init('Config', 'site','Yaml');
         $coreListProtectedPages   = \Cx\Core\Setting\Controller\Setting::getValue('coreListProtectedPages','Config');
 
         $objTpl = new \Cx\Core\Html\Sigma('.');
