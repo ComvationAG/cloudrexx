@@ -224,11 +224,11 @@ class Search
             // results are listed.
             if (
                 $coreListProtectedPages === 'on' &&
-                $objTpl->blockExists('search_has_protected_search_result') &&
+                $objTpl->blockExists('search_has_protected_results') &&
                 $this->hasProtectedResult() &&
                 !\FWUser::getFWUserObject()->objUser->isLoggedIn()
             ) {
-                $objTpl->touchBlock('search_has_protected_search_result');
+                $objTpl->touchBlock('search_has_protected_results');
             }
 
             $countResults = sizeof($arraySearchResults);
