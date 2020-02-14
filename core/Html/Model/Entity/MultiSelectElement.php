@@ -84,6 +84,13 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
     protected $delimiter = '\\';
 
     /**
+     * The scope of all registered MultiSelectElements
+     *
+     * @var array
+     */
+    protected static $scopes = array();
+
+    /**
      * MultiSelectElement constructor
      *
      * The notAssociatedValues do not necessarily have to contain only the
@@ -298,6 +305,26 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
     }
 
     /**
+     * Get all registered MultiSelectElement scopes
+     *
+     * @return array registered scopes
+     */
+    public static function getScopes()
+    {
+        return static::$scopes;
+    }
+
+    /**
+     * Add a new scope to the registered scopes
+     *
+     * @param string scope name
+     */
+    public static function addScope($scope)
+    {
+        static::$scopes[] = $scope;
+    }
+
+    /**
      * Load the JavaScript and CSS file for MultiSelectElement. JavaScript variables are
      * set, which are necessary for JavaScript to work correctly.
      *
@@ -307,13 +334,13 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
     public function render()
     {
         $scope = 'multi-select-' . $this->wrapperName;
+        static::addScope($scope);
         // load MultiSelectElement JavaScript code and CSS styles
         $directory = $this->getComponentController()->getDirectory(
             true, true
         );
         \JS::registerCSS($directory . '/View/Style/MultiSelectElement.css');
         \JS::registerJS($directory . '/View/Script/MultiSelectElement.js');
-        \JS::registerCode('MultiSelectElementScopes.push("'.$scope.'");');
 
         // Set JavaScript variables
         $cxJs = \ContrexxJavascript::getInstance();
@@ -323,10 +350,12 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
                 'associated_wrapper' => $this->wrapperName,
                 'associated_select' => $this->associatedName,
                 'not_associated_select' => $this->notAssociatedName,
-                'delimiter' => $this->delimiter
+                'delimiter' => $this->delimiter,
             ),
             $scope
         );
+        // Set global MultiSelectElement variable
+        $cxJs->setVariable('multi-select_element_scopes', static::getScopes(), 'multi-select');
 
         return parent::render();
     }

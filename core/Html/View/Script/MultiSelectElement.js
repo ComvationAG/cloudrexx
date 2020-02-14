@@ -1,4 +1,4 @@
-var MultiSelectElementScopes = [];
+var MultiSelectElementScopes = cx.variables.get('multi-select_element_scopes', 'multi-select');
 var MultiSelectElements = [];
 
 const MultiSelectElement = function(scope) {
