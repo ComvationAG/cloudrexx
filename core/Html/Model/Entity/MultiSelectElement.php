@@ -327,4 +327,84 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
 
         return parent::render();
     }
+
+    /**
+     * Find the associated and not associated select element
+     *
+     * @return array associated and not associated select element
+     */
+    protected function findSelectElements()
+    {
+        $selects = array();
+        foreach ($this->getChildren() as $wrapper) {
+            foreach ($wrapper->getChildren() as $child) {
+                switch ($child->getAttribute('name')) {
+                    case $this->associatedName . '[]':
+                        $selects['associated'] = $child;
+                        break;
+                    case $this->notAssociatedName . '[]':
+                        $selects['notAssociated'] = $child;
+                        break;
+                }
+            }
+        }
+        return $selects;
+    }
+
+    /**
+     * Set data for the MultiSelectElement.
+     * Submit the data as follows to replace the data of the MultiSelectElement:
+     * array(
+     *     'selectedOptions' - the keys of the selected options,
+     *     'options' -  all available options (associated and not-associated values together)
+     * )
+     *
+     * @param array $data new data as an array
+     */
+    public function setData($data)
+    {
+        $selects = $this->findSelectElements();
+        $associatedOptions = array();
+        $notAssociatedOptions = array();
+        foreach ($data['selectedOptions'] as $id) {
+            if (isset($data['options'][$id])) {
+                $associatedOptions[] = $data['options'][$id];
+            } else {
+                $notAssociatedOptions[] = $data['options'][$id];
+            }
+        }
+
+        if (!empty($selects['associated'])) {
+            $selects['associated']->setData($associatedOptions);
+        } else if (!empty($selects['notAssociated'])) {
+            $selects['notAssociated']->setData($notAssociatedOptions);
+        }
+    }
+
+    /**
+     * Get the data of the MultiSelectElement in the following scheme:
+     *
+     * array(
+     *     'selectedOptions' - the keys of the selected options,
+     *     'options' -  all available options (associated and not-associated values together)
+     * )
+     *
+     * @return array includes the data from the MultiSelect
+     */
+    public function getData()
+    {
+        $associatedOptions = array();
+        $notAssociatedOptions = array();
+        $selects = $this->findSelectElements();
+        if (!empty($selects['associated'])) {
+            $associatedOptions = $selects['associated']->getData();
+        } else if (!empty($selects['notAssociated'])) {
+            $notAssociatedOptions = $selects['notAssociated']->getData();
+        }
+
+        return array(
+            'selectedOptions' => array_keys($associatedOptions),
+            'options' => $associatedOptions + $notAssociatedOptions
+        );
+    }
 }
