@@ -25,7 +25,7 @@
  */
 
 /**
- * With the TwinSelect element you get two multiple-select elements. This makes
+ * With the MultiSelectElement element you get two multiple-select elements. This makes
  * it easier to select entries and post multiple ones.
  *
  * @copyright  Cloudrexx AG
@@ -37,7 +37,7 @@
 namespace Cx\Core\Html\Model\Entity;
 
 /**
- * With the TwinSelect element you get two multiple-select elements. This makes
+ * With the MultiSelectElement element you get two multiple-select elements. This makes
  * it easier to select entries and post multiple ones.
  *
  * @copyright  Cloudrexx AG
@@ -46,10 +46,10 @@ namespace Cx\Core\Html\Model\Entity;
  * @subpackage core_html
  * @since      v5.0.3
  */
-class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
+class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
 {
     /**
-     * Name of the wrapper to identify the TwinSelect
+     * Name of the wrapper to identify the MultiSelectElement
      *
      * @var string
      */
@@ -84,7 +84,14 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
     protected $delimiter = '\\';
 
     /**
-     * TwinSelect constructor
+     * The scope of all registered MultiSelectElements
+     *
+     * @var array
+     */
+    protected static $scopes = array();
+
+    /**
+     * MultiSelectElement constructor
      *
      * The notAssociatedValues do not necessarily have to contain only the
      * not assigned values. All possible entries can also be passed. The arrays
@@ -92,55 +99,56 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
      * same key are removed from the array notAssociatedValues.
      *
      * @param string $wrapperName         name of the wrapper to identify the
-     *                                    TwinSelect
+     *                                    MultiSelectElement
      * @param string $associatedName      name for the associated select
      * @param string $associatedTitle     to describe the select element
-     * @param array  $associatedValues    associated values
      * @param string $notAssociatedName   name for the not associated select
-     * @param string $notAssociatedTitle     to describe the select element
-     * @param array  $notAssociatedValues values that are not associated or all
-     *                                    possible values
+     * @param string $notAssociatedTitle  to describe the select element
+     * @param array  $options             all available options (associated and not-associated values together)
+     * @param array  $selectedOptions     the keys of the selected options
      * @param string $form                name of the associated form
      * @param \Cx\Core\Validate\Model\Entity\Validator $validator to validate
      */
     public function __construct(
         $wrapperName,
-        $associatedName = 'associated',
-        $associatedTitle = '',
-        $associatedValues = array(),
-        $notAssociatedName = 'not_associated',
-        $notAssociatedTitle = '',
-        $notAssociatedValues = array(),
-        $form = 'form',
+        $associatedName,
+        $associatedTitle,
+        $notAssociatedName,
+        $notAssociatedTitle,
+        $options,
+        $selectedOptions,
+        $form,
         $validator = null
     ) {
-        global $_ARRAYLANG, $objInit;
-
         //get the language interface text
-        $langData   = $objInit->loadLanguageData('Html');
-        $_ARRAYLANG = array_merge($_ARRAYLANG, $langData);
+        $frontend = $this->cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
+        $langData = \Env::get('init')->getComponentSpecificLanguageData('Html', $frontend);
 
         $this->wrapperName = $wrapperName;
         $this->form = $form;
         $this->associatedName = $associatedName;
         $this->notAssociatedName = $notAssociatedName;
 
-        // Remove the values, that are associated
         \Cx\Core\Html\Model\Entity\HtmlElement::__construct('div');
         $this->setAttribute('id', $wrapperName);
-        $this->addClass('twin-select');
+        $this->addClass('multi-select');
 
-        foreach ($associatedValues as $key=>$value) {
-            if (isset($notAssociatedValues[$key])) {
-                unset($notAssociatedValues[$key]);
+        // Split options in associated and not associated
+        $associatedValues = array();
+        $notAssociatedValues = array();
+        foreach ($options as $key => $value) {
+            if (in_array($key, $selectedOptions)) {
+                $associatedValues[$key] = $value;
+            } else {
+                $notAssociatedValues[$key] = $value;
             }
         }
 
         // Associated and not associated Wrapper
         $associatedWrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
-        $associatedWrapper->addClass('twin-select-wrapper');
+        $associatedWrapper->addClass('multi-select-wrapper');
         $notAssociatedWrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
-        $notAssociatedWrapper->addClass('twin-select-wrapper');
+        $notAssociatedWrapper->addClass('multi-select-wrapper');
 
         // Selects
         $associatedSelector = $this->getSelect(
@@ -152,16 +160,18 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
 
         // Buttons
         $btnWrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
-        $btnWrapper->addClass('twin-select-wrapper control-buttons');
+        $btnWrapper->addClass('multi-select-wrapper');
+        $btnWrapper->addClass('control-buttons');
+
         $addButton = $this->getControlElement(
             'button',
             'addBtn',
-            $_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_ADD_ENTRY']
+            $langData['TXT_CORE_HTML_MULTI_SELECT_ADD_ENTRY']
         );
         $removeButton = $this->getControlElement(
             'button',
             'removeBtn',
-            $_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_REMOVE_ENTRY']
+            $langData['TXT_CORE_HTML_MULTI_SELECT_REMOVE_ENTRY']
         );
         $btnWrapper->addChildren(
             array($addButton, $removeButton)
@@ -172,58 +182,41 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
             'div'
         );
         $associatedLinkWrapper->addClass('control-links');
-        $associatedSelectAllLink = $this->getControlElement(
+        $selectAllLink = $this->getControlElement(
             'a',
-            'select-all-associated',
-            $_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_SELECT_ALL']
+            'select-all',
+            $langData['TXT_CORE_HTML_MULTI_SELECT_SELECT_ALL']
         );
-        $associatedDeselectAllLink = $this->getControlElement(
+        $deselectAllLink = $this->getControlElement(
             'a',
-            'deselect-all-associated',
-            $_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_DESELECT_ALL']
-        );
-
-        $notAssociatedLinkWrapper = new \Cx\Core\Html\Model\Entity\HtmlElement(
-            'div'
-        );
-        $notAssociatedLinkWrapper->addClass('control-links');
-        $notAssociatedSelectAllLink = $this->getControlElement(
-            'a',
-            'select-all-not-associated',
-            $_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_SELECT_ALL']
-        );
-        $notAssociatedDeselectAllLink = $this->getControlElement(
-            'a',
-            'deselect-all-not-associated',
-            $_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_DESELECT_ALL']
+            'deselect-all',
+            $langData['TXT_CORE_HTML_MULTI_SELECT_DESELECT_ALL']
         );
 
         $associatedLinkWrapper->addChildren(
             array(
-                $associatedSelectAllLink,
-                $associatedDeselectAllLink
+                $selectAllLink,
+                $deselectAllLink
             )
         );
 
-        $notAssociatedLinkWrapper->addChildren(
-            array(
-                $notAssociatedSelectAllLink,
-                $notAssociatedDeselectAllLink
-            )
-        );
+        $notAssociatedLinkWrapper = clone $associatedLinkWrapper;
+        $associatedLinkWrapper->addClass('multi-select-associated');
+        $notAssociatedLinkWrapper->addClass('multi-select-not-associated');
 
         // Add titles for select elements
-        $associatedTitleElement = new \Cx\Core\Html\Model\Entity\TextElement(
-            $associatedTitle . '<br/>'
-        );
-        $notAssociatedTitleElement = new \Cx\Core\Html\Model\Entity\TextElement(
-            $notAssociatedTitle . '<br/>'
-        );
+        $associatedTitleElement = new \Cx\Core\Html\Model\Entity\TextElement($associatedTitle);
+        $associatedTitleSpan = new \Cx\Core\Html\Model\Entity\HtmlElement('span');
+        $associatedTitleSpan->addChild($associatedTitleElement);
+
+        $notAssociatedTitleElement = new \Cx\Core\Html\Model\Entity\TextElement($notAssociatedTitle);
+        $notAssociatedTitleSpan = new \Cx\Core\Html\Model\Entity\HtmlElement('span');
+        $notAssociatedTitleSpan->addChild($notAssociatedTitleElement);
 
         // Add elements to their wrappers
         $associatedWrapper->addChildren(
             array(
-                $associatedTitleElement,
+                $associatedTitleSpan,
                 $associatedSelector,
                 $associatedLinkWrapper
             )
@@ -231,7 +224,7 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
 
         $notAssociatedWrapper->addChildren(
             array(
-                $notAssociatedTitleElement,
+                $notAssociatedTitleSpan,
                 $notAssociatedSelector,
                 $notAssociatedLinkWrapper,
             )
@@ -293,7 +286,7 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
      * Get an element, which consists of the element tag and a text.
      * The defined text is also set as the title.
      *
-     * Used to get the control elements for TwinSelect
+     * Used to get the control elements for MultiSelectElement
      *
      * @param string $tag  the tag name of the element (e.g. button)
      * @param string $name to set the class name for the element
@@ -312,7 +305,27 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
     }
 
     /**
-     * Load the JavaScript and CSS file for TwinSelect. JavaScript variables are
+     * Get all registered MultiSelectElement scopes
+     *
+     * @return array registered scopes
+     */
+    public static function getScopes()
+    {
+        return static::$scopes;
+    }
+
+    /**
+     * Add a new scope to the registered scopes
+     *
+     * @param string scope name
+     */
+    public static function addScope($scope)
+    {
+        static::$scopes[] = $scope;
+    }
+
+    /**
+     * Load the JavaScript and CSS file for MultiSelectElement. JavaScript variables are
      * set, which are necessary for JavaScript to work correctly.
      *
      * @throws     \Cx\Core\Core\Model\Entity\SystemComponentException
@@ -320,31 +333,110 @@ class TwinSelect extends \Cx\Core\Html\Model\Entity\DataElement
      */
     public function render()
     {
-        $scope = 'twin-select-' . $this->wrapperName;
-        // load Twinselect JavaScript code and CSS styles
+        $scope = 'multi-select-' . $this->wrapperName;
+        static::addScope($scope);
+        // load MultiSelectElement JavaScript code and CSS styles
         $directory = $this->getComponentController()->getDirectory(
             true, true
         );
-        \JS::registerCSS($directory . '/View/Style/TwinSelect.css');
-        \JS::registerJS($directory . '/View/Script/TwinSelect.js');
-        \JS::registerCode('TwinSelectScopes.push("'.$scope.'");');
+        \JS::registerCSS($directory . '/View/Style/MultiSelectElement.css');
+        \JS::registerJS($directory . '/View/Script/MultiSelectElement.js');
 
         // Set JavaScript variables
         $cxJs = \ContrexxJavascript::getInstance();
-        $cxJs->setVariable('associated_form', $this->form, $scope);
         $cxJs->setVariable(
-            'associated_wrapper', $this->wrapperName, $scope
+            array(
+                'associated_form' => $this->form,
+                'associated_wrapper' => $this->wrapperName,
+                'associated_select' => $this->associatedName,
+                'not_associated_select' => $this->notAssociatedName,
+                'delimiter' => $this->delimiter,
+            ),
+            $scope
         );
-        $cxJs->setVariable(
-            'associated_select', $this->associatedName, $scope
-        );
-        $cxJs->setVariable(
-            'not_associated_select', $this->notAssociatedName, $scope
-        );
-        $cxJs->setVariable(
-            'delimiter', $this->delimiter, $scope
-        );
+        // Set global MultiSelectElement variable
+        $cxJs->setVariable('multi-select_element_scopes', static::getScopes(), 'multi-select');
 
         return parent::render();
+    }
+
+    /**
+     * Find the associated and not associated select element
+     *
+     * @return array associated and not associated select element
+     */
+    protected function findSelectElements()
+    {
+        $selects = array();
+        foreach ($this->getChildren() as $wrapper) {
+            foreach ($wrapper->getChildren() as $child) {
+                switch ($child->getAttribute('name')) {
+                    case $this->associatedName . '[]':
+                        $selects['associated'] = $child;
+                        break;
+                    case $this->notAssociatedName . '[]':
+                        $selects['notAssociated'] = $child;
+                        break;
+                }
+            }
+        }
+        return $selects;
+    }
+
+    /**
+     * Set data for the MultiSelectElement.
+     * Submit the data as follows to replace the data of the MultiSelectElement:
+     * array(
+     *     'selectedOptions' - the keys of the selected options,
+     *     'options' -  all available options (associated and not-associated values together)
+     * )
+     *
+     * @param array $data new data as an array
+     */
+    public function setData($data)
+    {
+        $selects = $this->findSelectElements();
+        $associatedOptions = array();
+        $notAssociatedOptions = array();
+        foreach ($data['selectedOptions'] as $id) {
+            if (isset($data['options'][$id])) {
+                $associatedOptions[] = $data['options'][$id];
+            } else {
+                $notAssociatedOptions[] = $data['options'][$id];
+            }
+        }
+
+        if (!empty($selects['associated'])) {
+            $selects['associated']->setData($associatedOptions);
+        } else if (!empty($selects['notAssociated'])) {
+            $selects['notAssociated']->setData($notAssociatedOptions);
+        }
+    }
+
+    /**
+     * Get the data of the MultiSelectElement in the following scheme:
+     *
+     * array(
+     *     'selectedOptions' - the keys of the selected options,
+     *     'options' -  all available options (associated and not-associated values together)
+     * )
+     *
+     * @return array includes the data from the MultiSelect
+     */
+    public function getData()
+    {
+        $associatedOptions = array();
+        $notAssociatedOptions = array();
+        $selects = $this->findSelectElements();
+        if (!empty($selects['associated'])) {
+            $associatedOptions = $selects['associated']->getData();
+        } else if (!empty($selects['notAssociated'])) {
+            $notAssociatedOptions = $selects['notAssociated']->getData();
+        }
+
+        return array(
+            'selectedOptions' => array_keys($associatedOptions),
+            'options' => $associatedOptions + $notAssociatedOptions
+        );
     }
 }
