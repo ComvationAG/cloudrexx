@@ -95,11 +95,10 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
      *                                    MultiSelectElement
      * @param string $associatedName      name for the associated select
      * @param string $associatedTitle     to describe the select element
-     * @param array  $associatedValues    associated values
      * @param string $notAssociatedName   name for the not associated select
-     * @param string $notAssociatedTitle     to describe the select element
-     * @param array  $notAssociatedValues values that are not associated or all
-     *                                    possible values
+     * @param string $notAssociatedTitle  to describe the select element
+     * @param array  $options             all available options (associated and not-associated values together)
+     * @param array  $selectedOptions     the keys of the selected options
      * @param string $form                name of the associated form
      * @param \Cx\Core\Validate\Model\Entity\Validator $validator to validate
      */
@@ -107,10 +106,10 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
         $wrapperName,
         $associatedName,
         $associatedTitle,
-        $associatedValues,
         $notAssociatedName,
         $notAssociatedTitle,
-        $notAssociatedValues,
+        $options,
+        $selectedOptions,
         $form,
         $validator = null
     ) {
@@ -127,10 +126,14 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
         $this->setAttribute('id', $wrapperName);
         $this->addClass('multi-select');
 
-        // Remove the values, that are associated
-        foreach ($associatedValues as $key=>$value) {
-            if (isset($notAssociatedValues[$key])) {
-                unset($notAssociatedValues[$key]);
+        // Split options in associated and not associated
+        $associatedValues = array();
+        $notAssociatedValues = array();
+        foreach ($options as $key => $value) {
+            if (in_array($key, $selectedOptions)) {
+                $associatedValues[$key] = $value;
+            } else {
+                $notAssociatedValues[$key] = $value;
             }
         }
 
