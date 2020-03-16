@@ -747,26 +747,25 @@ class NewsletterManager extends NewsletterLib
 
         // get the Crm membership association
         if (isset($_POST['newsletter_mail_crm_memberships'])) {
-            if (isset($_POST['newsletter_mail_crm_memberships']['associate'])) {
-                foreach ($_POST['newsletter_mail_crm_memberships']['associate'] as $crmMembershipId) {
+            if (isset($_POST['newsletter_mail_crm_memberships'])) {
+                foreach ($_POST['newsletter_mail_crm_memberships'] as $crmMembershipId) {
                     $crmMembershipFilter['associate'][] = intval($crmMembershipId);
                 }
             }
         }
         // get the Crm membership filter
-        if (isset($_POST['newsletter_mail_crm_filter_memberships'])) {
-            if (isset($_POST['newsletter_mail_crm_filter_memberships']['include'])) {
-                foreach ($_POST['newsletter_mail_crm_filter_memberships']['include'] as $crmMembershipId) {
-                    $crmMembershipFilter['include'][] = intval($crmMembershipId);
-                }
+        if (isset($_POST['newsletter_mail_crm_filter_memberships_include'])) {
+            foreach ($_POST['newsletter_mail_crm_filter_memberships_include'] as $crmMembershipId) {
+                $crmMembershipFilter['include'][] = intval($crmMembershipId);
             }
-            if (isset($_POST['newsletter_mail_crm_filter_memberships']['exclude'])) {
-                foreach ($_POST['newsletter_mail_crm_filter_memberships']['exclude'] as $crmMembershipId) {
-                    if (in_array(intval($crmMembershipId), $crmMembershipFilter['include'])) {
-                        continue;
-                    }
-                    $crmMembershipFilter['exclude'][] = intval($crmMembershipId);
+        }
+
+        if (isset($_POST['newsletter_mail_crm_filter_memberships_exclude'])) {
+            foreach ($_POST['newsletter_mail_crm_filter_memberships_exclude'] as $crmMembershipId) {
+                if (in_array(intval($crmMembershipId), $crmMembershipFilter['include'])) {
+                    continue;
                 }
+                $crmMembershipFilter['exclude'][] = intval($crmMembershipId);
             }
         }
 
@@ -950,7 +949,7 @@ class NewsletterManager extends NewsletterLib
             $crmMemberships,
             'newsletter_mail_form',
             'NEWSLETTER_CRM_MEMBERSHIP',
-            'newsletter_mail_crm_memberships[associate]',
+            'newsletter_mail_crm_memberships',
             $crmMembershipFilter['associate'],
             $crmLang
         );
@@ -959,7 +958,7 @@ class NewsletterManager extends NewsletterLib
             $crmMemberships,
             'newsletter_mail_form',
             'NEWSLETTER_CRM_FILTER_MEMBERSHIP_INCLUDE',
-            'newsletter_mail_crm_filter_memberships[include]',
+            'newsletter_mail_crm_filter_memberships_include',
             $crmMembershipFilter['include'],
             $crmLang
         );
@@ -968,7 +967,7 @@ class NewsletterManager extends NewsletterLib
             $crmMemberships,
             'newsletter_mail_form',
             'NEWSLETTER_CRM_FILTER_MEMBERSHIP_EXCLUDE',
-            'newsletter_mail_crm_filter_memberships[exclude]',
+            'newsletter_mail_crm_filter_memberships_exclude',
             $crmMembershipFilter['exclude'],
             $crmLang
         );
