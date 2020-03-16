@@ -2253,24 +2253,19 @@ class CrmLibrary
             $langNotAssociated = $lang['notAssociated'];
         }
 
-        $convertedList = array();
-        $convertedListSelected = array();
+        $list = array();
         foreach ($memberShips as $id) {
-            if (in_array($id, $selected)) {
-                $convertedList[$id] = contrexx_raw2xhtml($this->_memberShips[$id]);
-            } else {
-                $convertedListSelected[$id] = contrexx_raw2xhtml($this->_memberShips[$id]);
-            }
+            $list[$id] = contrexx_raw2xhtml($this->_memberShips[$id]);
         }
 
-        $membershipSelect = new \Cx\Core\Html\Model\Entity\TwinSelect(
+        $membershipSelect = new \Cx\Core\Html\Model\Entity\MultiSelectElement(
             'wrapper_' . $name,
             $name,
             $langAssociated,
-            $convertedList,
             $name . 'excluded',
             $langNotAssociated,
-            $convertedListSelected,
+            $list,
+            $selected,
             $form
         );
         $objTpl->setVariable(

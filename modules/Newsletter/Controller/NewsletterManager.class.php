@@ -1104,28 +1104,25 @@ class NewsletterManager extends NewsletterLib
         global $_ARRAYLANG;
 
         $arrLists = self::getLists();
-        $associatedLists = array();
         $lists = array();
         foreach ($arrLists as $id=>$list) {
             $lists[$id] = $list['name'];
         }
-        foreach($associatedListIds as $associatedListId){
-            $associatedLists[$associatedListId] = $arrLists[$associatedListId]['name'];
-        }
-        $associatedListsTwinSelect = new \Cx\Core\Html\Model\Entity\TwinSelect(
+
+        $associatedListsMultiSelect = new \Cx\Core\Html\Model\Entity\MultiSelectElement(
             'newsletter_mail_associated_list',
             'newsletter_mail_associated_list',
             'Zugehörige Listen wählen',
-            $associatedLists,
             'newsletter_mail_not_associated_list',
             'Verfügbare Listen',
             $lists,
+            $associatedListIds,
             'newsletter_mail_form'
         );
 
         $this->_objTpl->setVariable(
             array(
-                'NEWSLETTER_ASSOCIATED_LISTS' => $associatedListsTwinSelect,
+                'NEWSLETTER_ASSOCIATED_LISTS' => $associatedListsMultiSelect,
                 'TXT_NEWSLETTER_ASSOCIATED_LISTS' => $_ARRAYLANG['TXT_NEWSLETTER_ASSOCIATED_LISTS'],
             )
         );
@@ -1146,20 +1143,20 @@ class NewsletterManager extends NewsletterLib
         foreach($associatedGroupIds as $associatedGroupId){
             $associatedGroups[$associatedGroupId] = $groups[$associatedGroupId];
         }
-        $associatedGroupsTwinSelect = new \Cx\Core\Html\Model\Entity\TwinSelect(
+        $associatedGroupsMultiSelect = new \Cx\Core\Html\Model\Entity\MultiSelectElement(
             'newsletter_mail_group',
             'newsletter_mail_associated_group',
             'Zugehörige Benutzergruppen wählen',
-            $associatedGroups,
             'newsletter_mail_not_associated_group',
             'Verfügbare Benutzergruppen wählen',
             $groups,
+            $associatedGroupIds,
             'newsletter_mail_form'
         );
 
         $this->_objTpl->setVariable(
             array(
-                'NEWSLETTER_ASSOCIATED_GROUPS' => $associatedGroupsTwinSelect,
+                'NEWSLETTER_ASSOCIATED_GROUPS' => $associatedGroupsMultiSelect,
                 'TXT_NEWSLETTER_ASSOCIATED_GROUPS' => $_ARRAYLANG['TXT_NEWSLETTER_ASSOCIATED_GROUPS'],
             )
         );
