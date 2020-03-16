@@ -181,7 +181,6 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
             }
         }
 
-        \Cx\Core\Setting\Controller\Setting::init('Config', 'otherConfigurations', 'FileSystem');
         if (
             $this->enableChosen &&
             count($options) <= \Cx\Core\Setting\Controller\Setting::getValue('coreSimpleSelectLimit')
