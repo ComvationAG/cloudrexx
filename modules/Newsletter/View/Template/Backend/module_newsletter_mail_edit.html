@@ -131,6 +131,7 @@ $J(document).ready(function() {
     </td>
   </tr>
 
+  <!-- BEGIN deliver_user_recipients -->
   <tr class="row2" style="vertical-align:top;">
     <td width="15%">
         {TXT_NEWSLETTER_ASSOCIATED_GROUPS}
@@ -141,7 +142,9 @@ $J(document).ready(function() {
         {NEWSLETTER_ASSOCIATED_GROUPS}
     </td>
   </tr>
+  <!-- END deliver_user_recipients -->
 
+  <!-- BEGIN deliver_crm_recipients -->
   <tr class="row1" style="vertical-align:top;">
         <td width="15%">{TXT_NEWSLETTER_CRM_MEMBERSHIP}
             <!-- BEGIN crmMembershipAssociatedToolTipBeforeSend --><span class="icon-warning tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_INFO_ABOUT_ASSOCIATED_LISTS_SEND}</span><!-- END crmMembershipAssociatedToolTipBeforeSend -->
@@ -151,6 +154,9 @@ $J(document).ready(function() {
             {NEWSLETTER_CRM_MEMBERSHIP}
         </td>
     </tr>
+  <!-- END deliver_crm_recipients -->
+
+  <!-- BEGIN use_crm_filter -->
   <tr class="row1" style="vertical-align:top;">
     <td width="15%">{TXT_NEWSLETTER_CRM_MEMBERSHIP_FILTER}
         <span class="tooltip-trigger icon-info"></span>
@@ -170,6 +176,7 @@ $J(document).ready(function() {
         </div>
     </td>
   </tr>
+  <!-- END use_crm_filter -->
 
   <tr class="row2" style="vertical-align:top;">
     <td valign="top">{TXT_NEWSLETTER_ATTACH}</td>

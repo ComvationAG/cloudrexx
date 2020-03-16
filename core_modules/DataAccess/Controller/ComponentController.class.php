@@ -45,6 +45,31 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  * @subpackage core_modules_dataaccess
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
+
+    /**
+     * @var int Minimum length for API keys
+     */
+    const MIN_KEY_LENGTH = 32;
+
+    /**
+     * @var int Access ID assigned to this component
+     */
+    const MAIN_ACCESS_ID = 205;
+
+    /**
+     * @var string Message for exceptions forwarded to API
+     */
+    const ERROR_MESSAGE = 'Exception of type "%s" with message "%s"';
+
+    /**
+     * @inheritdoc
+     */
+    protected $enduserDocumentationUrl = 'https://www.cloudrexx.info/api';
+
+    /**
+     * @inheritdoc
+     */
+    protected $developerDocumentationUrl = 'https://wiki.cloudrexx.com/RESTful_API';
     
     /**
      * Returns all Controller class names for this component (except this)
@@ -52,10 +77,40 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * Be sure to return all your controller classes if you add your own
      * @return array List of Controller class names (without namespace)
      */
-    public function getControllerClasses() {
-        return array('JsonOutput', 'CliOutput');
+    public function getControllerClasses()
+    {
+        return array('JsonOutput', 'CliOutput', 'Backend', 'JsonDataAccess');
     }
-    
+
+    /**
+     * @inheritDoc
+     */
+    public function getControllersAccessableByJson() {
+        return array('JsonDataAccessController');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function registerEventListeners()
+    {
+        $apiListener = new \Cx\Core_Modules\DataAccess\Model\Event\ApiKeyEventListener(
+            $this->cx
+        );
+
+        $this->cx->getEvents()->addModelListener(
+            \Doctrine\ORM\Events::prePersist,
+            $this->getNamespace() .'\Model\Entity\ApiKey',
+            $apiListener
+        );
+
+        $this->cx->getEvents()->addModelListener(
+            \Doctrine\ORM\Events::preUpdate,
+            $this->getNamespace() .'\Model\Entity\ApiKey',
+            $apiListener
+        );
+    }
+
     /**
      * Returns a list of command mode commands provided by this component
      * @return array List of command names
@@ -77,6 +132,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 ),   // allowed methods
                 false                   // requires login
             ),
+            'apidoc' => new \Cx\Core_Modules\Access\Model\Entity\Permission(
+                array('cli', 'https'), // allowed protocols
+                array('get', 'cli') // allowed method
+            ),
         );
     }
 
@@ -94,6 +153,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 }
                 return 'RESTful data interchange API v1' . "\n" .
                     'Usage: v1 <outputModule> <dataSource> (<elementId>) (apikey=<apiKey>) (<options>)';
+            case 'apidoc':
+                $doc = 'Returns OpenAPI specification file for current system\'s API';
+                if (!$short) {
+                    $doc .= "\n" .
+                        'Usage: apidoc (regen)' . "\n" .
+                        '"regen" argument forces regeneration';
+                }
+                return $doc;
             default:
                 return '';
         }
@@ -114,6 +181,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             switch ($command) {
                 case 'v1':
                     $this->apiV1($command, $arguments, $dataArguments);
+                    break;
+                case 'apidoc':
+                    $this->generateApiDoc(current($arguments) == 'regen');
+                    break;
             }
         } catch (\Exception $e) {
             // This should only be used if API cannot handle the request at all.
@@ -164,7 +235,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             }
             $dataSource = $this->getDataSource($arguments[1]);
             $elementId = array();
-            if (isset($arguments[2])) {
+            if (!empty($arguments[2])) {
                 $argumentKeys = array_keys($arguments);
                 $primaryKeyNames = $dataSource->getIdentifierFieldNames();
                 for ($i = 0; $i < count($arguments) - 2; $i++) {
@@ -178,6 +249,29 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $apiKey = null;
             if (isset($arguments['apikey'])) {
                 $apiKey = $arguments['apikey'];
+            }
+            // force api key length
+            if (strlen($apiKey) < static::MIN_KEY_LENGTH) {
+                $response->setStatusCode(403);
+                throw new \Cx\Core\Error\Model\Entity\ShinyException('Access denied');
+            }
+
+            $requestReadonly = in_array($method, array('options', 'head', 'get'));
+
+            if (
+                $dataSource->isVersionable() &&
+                !$requestReadonly &&
+                (
+                    !isset($arguments['version']) ||
+                    $dataSource->getCurrentVersion($elementId) != $arguments['version']
+                )
+            ) {
+                $response->setStatusCode(409);
+                throw new \Cx\Core\Error\Model\Entity\ShinyException(
+                    'The current version of this object is newer than the ' .
+                        'version number you supplied or no version number ' .
+                        'was supplied. Please (re-)fetch first.'
+                );
             }
             
             $order = array();
@@ -232,15 +326,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $em = $this->cx->getDb()->getEntityManager();
             $dataAccessRepo = $em->getRepository($this->getNamespace() . '\Model\Entity\DataAccess');
             $dataAccess = $dataAccessRepo->getAccess(
-                $outputModule,
-                $dataSource,
                 $method,
                 $apiKey,
-                $arguments
+                $arguments,
+                $arguments[1]
             );
             if (!$dataAccess) {
                 $response->setStatusCode(403);
-                throw new \BadMethodCallException('Access denied');
+                throw new \Cx\Core\Error\Model\Entity\ShinyException('Access denied');
             }
             
             if (
@@ -248,7 +341,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 !in_array($arguments[0], $dataAccess->getAllowedOutputMethods())
             ) {
                 $response->setStatusCode(403);
-                throw new \BadMethodCallException('Access denied');
+                throw new \Cx\Core\Error\Model\Entity\ShinyException('Access denied');
             }
             
             if (count($dataAccess->getAccessCondition())) {
@@ -256,6 +349,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             }
             
             $data = array();
+            $metaData = array();
             switch ($method) {
                 // administrative access
                 case 'options':
@@ -291,7 +385,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     // should be 404 if element is not set or not found
                     $data = $dataSource->remove($elementId);
                     break;
-                
+
                 // read access
                 case 'head':
                     // return the same headers as 'get', but no body
@@ -301,13 +395,37 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     // should be 200
                     // should be 404 if item not found
                     $data = $dataSource->get($elementId, $filter, $order, $limit, $offset, $dataAccess->getFieldList());
+                    if ($dataSource->isVersionable()) {
+                        $metaData['version'] = array();
+                        if (!empty($elementId)) {
+                            $metaData['version'] = $dataSource->getCurrentVersion(
+                                $elementId
+                            );
+                        } else {
+                            foreach (array_keys($data) as $key) {
+                                $metaData['version'][$key] = $dataSource->getCurrentVersion(
+                                    explode('/', $key)
+                                );
+                            }
+                        }
+                    }
                     break;
             }
             $response->setStatus(
                 \Cx\Core_Modules\DataAccess\Model\Entity\ApiResponse::STATUS_OK
             );
             $response->setData($data);
-            
+            $response->setMetadata($metaData);
+
+            $response->send($outputModule);
+        } catch (\Cx\Core\Error\Model\Entity\ShinyException $e) {
+            $response->setStatus(
+                \Cx\Core_Modules\DataAccess\Model\Entity\ApiResponse::STATUS_ERROR
+            );
+            $response->addMessage(
+                \Cx\Core_Modules\DataAccess\Model\Entity\ApiResponse::MESSAGE_TYPE_ERROR,
+                $e->getMessage()
+            );
             $response->send($outputModule);
         } catch (\Exception $e) {
             $lang = \Env::get('init')->getComponentSpecificLanguageData(
@@ -321,7 +439,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $response->addMessage(
                 \Cx\Core_Modules\DataAccess\Model\Entity\ApiResponse::MESSAGE_TYPE_ERROR,
                 sprintf(
-                    $lang['TXT_CORE_MODULE_DATA_ACCESS_ERROR'],
+                    static::ERROR_MESSAGE,
                     get_class($e),
                     $e->getMessage()
                 )
@@ -360,6 +478,44 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             throw new \Exception('No such DataSource: ' . $name);
         }
         return $dataAccess->getDataSource();
+    }
+    
+    /**
+     * Outputs the swagger.json file for the current installation
+     *
+     * If $forceRegen is not set to true, the file will be (re)generated if:
+     * - it does not yet exist /tmp/swagger.json
+     * - it is older than ??
+     * @todo Implement "older than"...
+     * @param boolean $forceRegen (optional) If set to true file is always regenerated
+     */
+    protected function generateApiDoc($forceRegen = false) {
+        $filename = $this->cx->getWebsiteTempPath() . '/swagger.json';
+        if (
+            $forceRegen ||
+            !file_exists($filename) ||
+            false // file not too old
+        ) {
+            $this->cx->getClassLoader()->loadFile(
+                $this->cx->getCodeBaseLibraryPath() . '/OpenApi/src/functions.php'
+            );
+            $openapi = \OpenApi\scan(
+                array(
+                    $this->cx->getCodeBaseCorePath(),
+                    $this->cx->getCodeBaseCoreModulePath(),
+                    $this->cx->getCodeBaseModulePath(),
+                )
+            );
+            $objFile = new \Cx\Lib\FileSystem\File($filename);
+            $objFile->write($openapi->toJson());
+        }
+        // echo file contents:
+        try {
+            $objFile = new \Cx\Lib\FileSystem\File($filename);
+            echo $objFile->getData();
+        } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
+            \DBG::msg($e->getMessage());
+        }
     }
 }
 
