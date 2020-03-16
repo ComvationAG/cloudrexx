@@ -1,7 +1,7 @@
-var TwinSelectScopes = [];
-var TwinSelects = [];
+var MultiSelectElementScopes = cx.variables.get('multi-select_element_scopes', 'multi-select');
+var MultiSelectElements = [];
 
-const TwinSelect = function(scope) {
+const MultiSelectElement = function(scope) {
     this.delimiter = cx.variables.get('delimiter', scope);
     this.wrapper = document.getElementById(cx.variables.get('associated_wrapper', scope));
     this.form = document.getElementById(cx.variables.get('associated_form', scope));
@@ -10,10 +10,10 @@ const TwinSelect = function(scope) {
     this.buttonWrapper = this.wrapper.querySelector('.control-buttons');
     this.addBtn = this.wrapper.querySelector('.addBtn');
     this.removeBtn =  this.wrapper.querySelector('.removeBtn');
-    this.associatedSelectAllLinks = this.wrapper.querySelector('.select-all-associated');
-    this.notAssociatedSelectAllLinks = this.wrapper.querySelector('.select-all-not-associated');
-    this.associatedDeselectAllLinks = this.wrapper.querySelector('.deselect-all-associated');
-    this.notAssociatedDeselectAllLinks = this.wrapper.querySelector('.deselect-all-not-associated');
+    this.associatedSelectAllLinks = this.wrapper.querySelector('.multi-select-associated .select-all');
+    this.notAssociatedSelectAllLinks = this.wrapper.querySelector('.multi-select-not-associated .select-all');
+    this.associatedDeselectAllLinks = this.wrapper.querySelector('.multi-select-associated .deselect-all');
+    this.notAssociatedDeselectAllLinks = this.wrapper.querySelector('.multi-select-not-associated .deselect-all');
 
     this.moveOptions = function (from, dest, add, remove) {
         if (from.selectedIndex < 0) {
@@ -163,25 +163,25 @@ const TwinSelect = function(scope) {
     this.initEventListeners();
 };
 
-function initTwinSelect() {
-    TwinSelectScopes.forEach(function (scope) {
-        const twinSelect = new TwinSelect(scope);
-        TwinSelects.push(twinSelect);
+function initMultiSelectElement() {
+    MultiSelectElementScopes.forEach(function (scope) {
+        const multiSelect = new MultiSelectElement(scope);
+        MultiSelectElements.push(multiSelect);
         window.addEventListener('resize', function () {
-            twinSelect.size();
+            multiSelect.size();
         });
-        twinSelect.size();
+        multiSelect.size();
     });
 }
 
-function resizeTwinSelects() {
-    TwinSelects.forEach(function (twinSelect) {
-        twinSelect.size();
+function resizeMultiSelectElements() {
+    MultiSelectElements.forEach(function (multiSelect) {
+        multiSelect.size();
     });
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    initTwinSelect();
+    initMultiSelectElement();
 });
 
 
