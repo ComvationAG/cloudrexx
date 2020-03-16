@@ -198,7 +198,7 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
         $select = $this->getSelect(
             $this->associatedName, $this->options, $this->associatedValues
         );
-        $select->addClass('init-chosen');
+        $select->addClass('chzn-select');
         $select->setAttribute('data-placeholder', $this->associatedTitle);
         $this->addChild($select);
     }
