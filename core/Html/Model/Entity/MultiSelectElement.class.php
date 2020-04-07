@@ -129,7 +129,7 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
         $this->associatedName = $associatedName;
         $this->notAssociatedName = $notAssociatedName;
 
-        \Cx\Core\Html\Model\Entity\HtmlElement::__construct('div');
+        parent::__construct($wrapperName, '', 'div');
         $this->setAttribute('id', $wrapperName);
         $this->addClass('multi-select');
 
