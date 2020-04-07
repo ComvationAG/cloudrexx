@@ -21,7 +21,7 @@ $_ARRAYLANG['TXT_CORE_HTML_PLEASE_CHOOSE'] = 'Bitte wählen...';
 $_ARRAYLANG['TXT_CORE_HTML_CANT_UPDATE_STATUS'] = 'Status konnte nicht aktualisiert werden.';
 $_ARRAYLANG['TXT_CORE_HTML_EXPORT'] = 'Mit aktuellem Filter zu CSV exportieren';
 
-// Twin Select
+// Multi Select Element
 $_ARRAYLANG['TXT_CORE_HTML_MULTI_SELECT_ADD_ENTRY'] = 'Zuweisen';
 $_ARRAYLANG['TXT_CORE_HTML_MULTI_SELECT_REMOVE_ENTRY'] = 'Entfernen';
 $_ARRAYLANG['TXT_CORE_HTML_MULTI_SELECT_SELECT_ALL'] = 'Alle auswählen';
