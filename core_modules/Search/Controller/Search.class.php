@@ -221,7 +221,7 @@ class Search
             // This only for users who are not logged in yet.
             // If the setting coreListProtectedPages is deactivated, it makes
             // no sense to display this block, since the protected search
-            // results are listed.
+            // results are not listed.
             if (
                 $coreListProtectedPages === 'on' &&
                 $objTpl->blockExists('search_has_protected_results') &&
